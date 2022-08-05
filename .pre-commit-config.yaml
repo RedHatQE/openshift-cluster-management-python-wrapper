@@ -1,0 +1,53 @@
+default_language_version:
+    python: python3
+
+repos:
+  - repo: https://github.com/myint/autoflake
+    rev: "v1.4"
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-unused-variables
+          - --remove-all-unused-imports
+
+  - repo: https://github.com/hadialqattan/pycln
+    rev: "v1.2.5"
+    hooks:
+        - id: pycln
+
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: "v5.10.1"
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/psf/black
+    rev: "22.3.0"
+    hooks:
+    - id: black
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v4.1.0"
+    hooks:
+    - id: check-merge-conflict
+    - id: debug-statements
+    - id: trailing-whitespace
+      args: [--markdown-linebreak-ext=md] # Do not process Markdown files.
+    - id: end-of-file-fixer
+    - id: check-ast
+    - id: check-builtin-literals
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: "4.0.1"
+    hooks:
+      - id: flake8
+        additional_dependencies: [
+          "git+https://github.com/RedHatQE/flake8-plugins.git",
+          "pep8-naming",
+          "flake8-mutable",
+        ]
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.2.0
+    hooks:
+      - id: detect-secrets
