@@ -25,7 +25,6 @@ class OCMPythonClient(ApiClient):
     ):
         self.base_api_uri = base_api_url
         self.token = token
-        # self.last_token_refresh_time = 0.00
 
         self.client_config = Configuration(
             host=base_api_url,
@@ -46,6 +45,7 @@ class OCMPythonClient(ApiClient):
             },
         )
 
+        # TODO: Check which exceptions are needed
         if response.status_code != 200:
             if response.status_code == 400:
                 if (
