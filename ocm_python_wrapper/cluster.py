@@ -9,7 +9,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Cluster:
-    def __init__(self, api_client, name=None):
+    def __init__(self, api_client, name):
         self.api_client = api_client
         self.name = name
         self.cluster_id = self._cluster_id()
