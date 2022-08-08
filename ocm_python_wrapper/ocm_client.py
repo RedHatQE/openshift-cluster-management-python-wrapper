@@ -20,10 +20,12 @@ class OCMPythonClient(ApiClient):
     def __init__(
         self,
         token,
+        endpoint,
         base_api_url=API_URLS["production"],
         discard_unknown_keys=False,
     ):
         self.base_api_uri = base_api_url
+        self.endpoint = endpoint
         self.token = token
 
         self.client_config = Configuration(
@@ -35,9 +37,8 @@ class OCMPythonClient(ApiClient):
         super().__init__(configuration=self.client_config)
 
     def __confirm_auth(self):
-        endpoint = "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token"
         response = requests.post(
-            endpoint,
+            self.endpoint,
             data={
                 "grant_type": "refresh_token",
                 "client_id": "cloud-services",
