@@ -14,6 +14,7 @@ setup(
         "colorlog",
         "ocm-python-client",
         "requests",
+        "pyyaml",
     ],
     python_requires=">=3.6",
 )

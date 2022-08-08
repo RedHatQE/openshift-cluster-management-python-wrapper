@@ -2,6 +2,7 @@
 import logging
 
 import requests
+from ocm_python_client.api.default_api import DefaultApi
 
 from ocm_python_client.api_client import ApiClient
 from ocm_python_client.configuration import Configuration
@@ -9,10 +10,7 @@ from ocm_python_client.exceptions import UnauthorizedException
 
 from ocm_python_wrapper.exceptions import AuthenticationError, EndpointAccessError
 
-API_URLS = {
-    "stage": "https://api.stage.openshift.com",
-    "production": "https://api.openshift.com",
-}
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -21,15 +19,13 @@ class OCMPythonClient(ApiClient):
         self,
         token,
         endpoint,
-        base_api_url=API_URLS["production"],
+        api_host="production",
         discard_unknown_keys=False,
     ):
-        self.base_api_uri = base_api_url
         self.endpoint = endpoint
         self.token = token
-
         self.client_config = Configuration(
-            host=base_api_url,
+            host=self.get_base_api_uri(api_host),
             access_token=self.__confirm_auth(),
             discard_unknown_keys=discard_unknown_keys,
         )
@@ -59,7 +55,7 @@ class OCMPythonClient(ApiClient):
                         Error Code: {response.status_code}"""
                     )
             else:
-                raise EndpointAccessError(err=response.status_code, endpoint=endpoint)
+                raise EndpointAccessError(err=response.status_code, endpoint=self.endpoint)
 
         return response.json()["access_token"]
 
@@ -70,3 +66,15 @@ class OCMPythonClient(ApiClient):
             LOGGER.info("Refreshing client token.")
             self.client_config.access_token = self.__confirm_auth()
             return super().call_api(*args, **kwargs)
+
+    @property
+    def client(self):
+        return DefaultApi(api_client=self)
+
+    @staticmethod
+    def get_base_api_uri(api_host):
+        api_hosts_config = Configuration().get_host_settings()
+        host_config = [host["url"] for host in api_hosts_config if host["description"].lower() == api_host]
+        if not host_config:
+            raise ValueError(f"Allowed configuration: {api_hosts_config}")
+        return host_config[0]
