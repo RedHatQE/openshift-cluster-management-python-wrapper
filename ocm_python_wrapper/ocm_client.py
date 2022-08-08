@@ -7,7 +7,7 @@ from ocm_python_client.api_client import ApiClient
 from ocm_python_client.configuration import Configuration
 from ocm_python_client.exceptions import UnauthorizedException
 
-from ocm_python_wrapper.exceptions import AuthenticationFailed, EndpointAccessFailed
+from ocm_python_wrapper.exceptions import AuthenticationError, EndpointAccessError
 
 API_URLS = {
     "stage": "https://api.stage.openshift.com",
@@ -52,13 +52,13 @@ class OCMPythonClient(ApiClient):
                     response.json().get("error_description")
                     == "Offline user session not found"
                 ):
-                    raise AuthenticationFailed(
+                    raise AuthenticationError(
                         f"""OFFLINE Token Expired! 
                         Please update your config with a new token from: https://cloud.redhat.com/openshift/token\n"
                         Error Code: {response.status_code}"""
                     )
             else:
-                raise EndpointAccessFailed(err=response.status_code, endpoint=endpoint)
+                raise EndpointAccessError(err=response.status_code, endpoint=endpoint)
 
         return response.json()["access_token"]
 

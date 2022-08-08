@@ -3,6 +3,7 @@ import logging
 from ocm_python_client import ApiException
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
 
+from ocm_python_wrapper.exceptions import MissingResourceError
 
 LOGGER = logging.getLogger(__name__)
 
@@ -17,8 +18,9 @@ class Cluster:
         cluster_info = self.api_client.api_clusters_mgmt_v1_clusters_get(
             search=f"name like '{self.name}%'"
         )
-        assert cluster_info.items, f"Cluster {self.name} does not exist"
-        return cluster_info.items[0]["id"]
+        if cluster_info:
+            return cluster_info.items[0]["id"]
+        raise MissingResourceError(name=self.name, kind="cluster")
 
     @property
     def instance(self):
