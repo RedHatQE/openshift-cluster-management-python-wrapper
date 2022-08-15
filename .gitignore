@@ -50,9 +50,6 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
-.pytest_cache/
-pytest-tests.log
-tests-collected-info
 
 # Translations
 *.mo
@@ -62,10 +59,6 @@ tests-collected-info
 *.log
 local_settings.py
 db.sqlite3
-
-# Flask stuff:
-instance/
-.webassets-cache
 
 # Scrapy stuff:
 .scrapy
@@ -84,9 +77,6 @@ target/
 
 # celery beat schedule file
 celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
 
 # Environments
 .env
@@ -115,9 +105,6 @@ docs/source/rst
 
 # IntelliJ project folder
 .idea/
-
-# General
-local-cluster/_hco/
 
 # nmp
 node_modules/

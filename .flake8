@@ -10,9 +10,9 @@ exclude =
     .cache/*
 
 enable-extensions =
-    FCFN,
+    FCN,
 
-fcfn_exclude_functions =
+fcn_exclude_functions =
     LOGGER,
     os,
     fd,
