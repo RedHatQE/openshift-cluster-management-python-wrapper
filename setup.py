@@ -13,7 +13,9 @@ setup(
     install_requires=[
         "colorlog",
         "ocm-python-client",
+        "openshift-python-wrapper",
         "requests",
+        "pyyaml",
     ],
     python_requires=">=3.6",
 )
