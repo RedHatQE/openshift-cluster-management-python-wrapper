@@ -2,9 +2,10 @@ import logging
 
 import yaml
 from ocm_python_client import ApiException
+from ocm_python_client.model.add_on_installation import AddOnInstallation
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
-from ocp_resources.resource import get_client
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from ocp_utilities.infra import get_client
 
 from ocm_python_wrapper.exceptions import MissingResourceError
 
@@ -150,3 +151,10 @@ class Cluster:
         except TimeoutExpiredError:
             LOGGER.error("Upgrade policy was not updated")
             raise
+
+    def install_addon(self, addon_installation_dict):
+        LOGGER.info(f"Installing addon {addon_installation_dict['id']}")
+        return self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
+            cluster_id=self.cluster_id,
+            add_on_installation=AddOnInstallation(**addon_installation_dict),
+        )

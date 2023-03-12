@@ -14,6 +14,7 @@ setup(
         "colorlog",
         "ocm-python-client",
         "openshift-python-wrapper",
+        "openshift-python-utilities",
         "requests",
         "pyyaml",
     ],
