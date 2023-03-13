@@ -2,15 +2,19 @@ import logging
 
 import yaml
 from ocm_python_client import ApiException
+from ocm_python_client.exceptions import NotFoundException
+from ocm_python_client.model.add_on import AddOn
+from ocm_python_client.model.add_on_installation import AddOnInstallation
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
-from ocp_resources.resource import get_client
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from ocp_utilities.infra import get_client
 
 from ocm_python_wrapper.exceptions import MissingResourceError
 
-
 LOGGER = logging.getLogger(__name__)
 TIMEOUT_10MIN = 10 * 60
+TIMEOUT_30MIN = 30 * 60
+SLEEP_1SEC = 1
 
 
 class Clusters:
@@ -150,3 +154,112 @@ class Cluster:
         except TimeoutExpiredError:
             LOGGER.error("Upgrade policy was not updated")
             raise
+
+
+class ClusterAddOn(Cluster):
+    """
+    manage cluster addon
+
+    Example:
+         _client = OCMPythonClient(
+        token=os.environ["OCM_TOKEN"],
+        endpoint="https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token",
+        api_host="stage",
+        discard_unknown_keys=True,
+        ).client
+        cluster_addon = ClusterAddOn(
+            client=_client, name="cluster-name", addon_name="ocm-addon-test-operator"
+        )
+        cluster_addon.install_addon(parameters=AddOnInstallationParameter(id="has-external-resources", value="false"))
+        cluster_addon.remove_addon()
+
+    """
+
+    class State:
+        INSTALLING = "installing"
+        READY = "ready"
+
+    def __init__(self, client, cluster_name, addon_name):
+        super().__init__(client=client, name=cluster_name)
+        self.addon_name = addon_name
+
+    def addon_info(self):
+        return self.client.api_clusters_mgmt_v1_addons_addon_id_get(
+            self.addon_name
+        ).to_dict()
+
+    def install_addon(self, parameters=None, wait=True):
+        addon = AddOn(id=self.addon_name)
+        _addon_installation_dict = {
+            "id": self.addon_name,
+            "addon": addon,
+        }
+        if parameters:
+            _addon_installation_dict["parameters"] = {"items": [parameters]}
+
+        LOGGER.info(f"Installing addon {self.addon_name}")
+        res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
+            cluster_id=self.cluster_id,
+            add_on_installation=AddOnInstallation(
+                _check_type=False, **_addon_installation_dict
+            ),
+        )
+        if wait:
+            self.wait_for_install_state(state=self.State.READY)
+
+        LOGGER.info(f"{self.addon_name} successfully installed")
+        return res
+
+    def addon_installation_instance(self):
+        try:
+            return self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_get(
+                cluster_id=self.cluster_id, addoninstallation_id=self.addon_name
+            )
+        except NotFoundException:
+            LOGGER.info(f"{self.addon_name} not found")
+            return
+
+    def addon_installation_instance_sampler(
+        self, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC
+    ):
+        return TimeoutSampler(
+            wait_timeout=wait_timeout,
+            sleep=sleep,
+            func=self.addon_installation_instance,
+        )
+
+    def wait_for_install_state(
+        self, state, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC
+    ):
+        _state = None
+        try:
+            for (
+                _addon_installation_instance
+            ) in self.addon_installation_instance_sampler(
+                wait_timeout=wait_timeout, sleep=sleep
+            ):
+                _state = _addon_installation_instance.get("state")
+                if _state == state:
+                    return True
+        except TimeoutExpiredError:
+            LOGGER.error(
+                f"Timeout waiting for {self.addon_name} state to be {state}, last state was {_state}"
+            )
+            raise
+
+    def remove_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC):
+        LOGGER.info(f"Removing addon {self.addon_name}")
+        res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_delete(
+            cluster_id=self.cluster_id,
+            addoninstallation_id=self.addon_name,
+        )
+        if wait:
+            for (
+                _addon_installation_instance
+            ) in self.addon_installation_instance_sampler(
+                wait_timeout=wait_timeout, sleep=sleep
+            ):
+                if not _addon_installation_instance:
+                    return True
+        LOGGER.info(f"{self.addon_name} was successfully removed")
+        return res
