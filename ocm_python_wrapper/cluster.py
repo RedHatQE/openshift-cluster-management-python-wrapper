@@ -5,6 +5,9 @@ from ocm_python_client import ApiException
 from ocm_python_client.exceptions import NotFoundException
 from ocm_python_client.model.add_on import AddOn
 from ocm_python_client.model.add_on_installation import AddOnInstallation
+from ocm_python_client.model.add_on_installation_parameter import (
+    AddOnInstallationParameter,
+)
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 from ocp_utilities.infra import get_client
@@ -171,8 +174,8 @@ class ClusterAddOn(Cluster):
             client=_client, cluster_name="cluster-name", addon_name="ocm-addon-test-operator"
         )
         parameters = [
-            AddOnInstallationParameter(id="has-external-resources", value="false"),
-            AddOnInstallationParameter(id="aws-cluster-test-param", value="false"),
+            {"id": "has-external-resources", "value": "false"},
+            {"id": "aws-cluster-test-param", "value": "false"},
         ]
         cluster_addon.install_addon(parameters=parameters)
         cluster_addon.remove_addon()
@@ -196,9 +199,8 @@ class ClusterAddOn(Cluster):
         _info = self.addon_info()
         _parameters = _info.get("parameters")
         if not _parameters and parameters:
-            raise ValueError(f"{self.addon_name} does not get any parameters")
+            raise ValueError(f"{self.addon_name} does not take any parameters")
 
-        _parameters["items"]
         required_parameters = [
             parm["id"] for parm in _parameters["items"] if parm["required"] is True
         ]
@@ -219,7 +221,7 @@ class ClusterAddOn(Cluster):
         Install addon on the cluster
 
         Args:
-            parameters (list): List of AddOnInstallationParameter
+            parameters (list): List of dict
             wait (bool): True to wait for addon to be installed
         """
         addon = AddOn(id=self.addon_name)
@@ -228,8 +230,14 @@ class ClusterAddOn(Cluster):
             "addon": addon,
         }
         if parameters:
+            _parameters = []
             self.validate_addon_parameters(parameters=parameters)
-            _addon_installation_dict["parameters"] = {"items": parameters}
+            for params in parameters:
+                _parameters.append(
+                    AddOnInstallationParameter(id=params["id"], value=params["value"])
+                )
+
+            _addon_installation_dict["parameters"] = {"items": _parameters}
 
         LOGGER.info(f"Installing addon {self.addon_name}")
         res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
