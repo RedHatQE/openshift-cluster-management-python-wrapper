@@ -156,9 +156,9 @@ class Cluster:
             raise
 
 
-class ClusterAddOns(Cluster):
+class ClusterAddOn(Cluster):
     """
-    manage cluster addons
+    manage cluster addon
 
     Example:
          _client = OCMPythonClient(
@@ -167,11 +167,11 @@ class ClusterAddOns(Cluster):
         api_host="stage",
         discard_unknown_keys=True,
         ).client
-        cluster_addons = ClusterAddOns(
-            client=_client, name="myk412", addon_name="ocm-addon-test-operator"
+        cluster_addon = ClusterAddOn(
+            client=_client, name="cluster-name", addon_name="ocm-addon-test-operator"
         )
-        cluster_addons.install_addon(parameters=AddOnInstallationParameter(id="has-external-resources", value="false"))
-        cluster_addons.remove_addon()
+        cluster_addon.install_addon(parameters=AddOnInstallationParameter(id="has-external-resources", value="false"))
+        cluster_addon.remove_addon()
 
     """
 
@@ -216,9 +216,12 @@ class ClusterAddOns(Cluster):
                 cluster_id=self.cluster_id, addoninstallation_id=self.addon_name
             )
         except NotFoundException:
+            LOGGER.info(f"{self.addon_name} not found")
             return
 
-    def addon_instance_sampler(self, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC):
+    def addon_installation_instance_sampler(
+        self, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC
+    ):
         return TimeoutSampler(
             wait_timeout=wait_timeout,
             sleep=sleep,
@@ -228,11 +231,21 @@ class ClusterAddOns(Cluster):
     def wait_for_install_state(
         self, state, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC
     ):
-        for _addon_instance in self.addon_instance_sampler(
-            wait_timeout=wait_timeout, sleep=sleep
-        ):
-            if _addon_instance.get("state") == state:
-                return True
+        _state = None
+        try:
+            for (
+                _addon_installation_instance
+            ) in self.addon_installation_instance_sampler(
+                wait_timeout=wait_timeout, sleep=sleep
+            ):
+                _state = _addon_installation_instance.get("state")
+                if _state == state:
+                    return True
+        except TimeoutExpiredError:
+            LOGGER.error(
+                f"Timeout waiting for {self.addon_name} state to be {state}, last state was {_state}"
+            )
+            raise
 
     def remove_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC):
         LOGGER.info(f"Removing addon {self.addon_name}")
@@ -241,10 +254,12 @@ class ClusterAddOns(Cluster):
             addoninstallation_id=self.addon_name,
         )
         if wait:
-            for _addon_instance in self.addon_instance_sampler(
+            for (
+                _addon_installation_instance
+            ) in self.addon_installation_instance_sampler(
                 wait_timeout=wait_timeout, sleep=sleep
             ):
-                if not _addon_instance:
+                if not _addon_installation_instance:
                     return True
         LOGGER.info(f"{self.addon_name} was successfully removed")
         return res
