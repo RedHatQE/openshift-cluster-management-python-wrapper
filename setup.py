@@ -3,7 +3,6 @@
 
 from setuptools import find_packages, setup
 
-
 setup(
     name="openshift-cluster-management-python-wrapper",
     license="apache-2.0",
@@ -16,6 +15,7 @@ setup(
         "openshift-python-wrapper",
         "requests",
         "pyyaml",
+        "openshift-python-utilities",
     ],
     python_requires=">=3.6",
 )

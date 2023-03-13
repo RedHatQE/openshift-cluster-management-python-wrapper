@@ -9,7 +9,6 @@ from ocm_python_client.exceptions import UnauthorizedException
 
 from ocm_python_wrapper.exceptions import AuthenticationError, EndpointAccessError
 
-
 LOGGER = logging.getLogger(__name__)
 
 
