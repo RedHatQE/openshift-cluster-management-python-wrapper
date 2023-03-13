@@ -202,9 +202,9 @@ class ClusterAddOn(Cluster):
             raise ValueError(f"{self.addon_name} does not take any parameters")
 
         required_parameters = [
-            parm["id"] for parm in _parameters["items"] if parm["required"] is True
+            param["id"] for param in _parameters["items"] if param["required"] is True
         ]
-        user_addon_parameters = [parm["id"] for parm in parameters]
+        user_addon_parameters = [param["id"] for param in parameters]
 
         missing_parameter = []
         for param in required_parameters:
