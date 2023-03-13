@@ -13,6 +13,7 @@ from ocm_python_wrapper.exceptions import MissingResourceError
 
 LOGGER = logging.getLogger(__name__)
 TIMEOUT_10MIN = 10 * 60
+TIMEOUT_30MIN = 30 * 60
 SLEEP_1SEC = 1
 
 
@@ -182,13 +183,20 @@ class ClusterAddOns(Cluster):
         super().__init__(client=client, name=cluster_name)
         self.addon_name = addon_name
 
-    def install_addon(self, parameters, wait=True):
+    def addon_info(self):
+        return self.client.api_clusters_mgmt_v1_addons_addon_id_get(
+            self.addon_name
+        ).to_dict()
+
+    def install_addon(self, parameters=None, wait=True):
         addon = AddOn(id=self.addon_name)
         _addon_installation_dict = {
             "id": self.addon_name,
             "addon": addon,
-            "parameters": {"items": [parameters]},
         }
+        if parameters:
+            _addon_installation_dict["parameters"] = {"items": [parameters]}
+
         LOGGER.info(f"Installing addon {self.addon_name}")
         res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
             cluster_id=self.cluster_id,
@@ -202,7 +210,7 @@ class ClusterAddOns(Cluster):
         LOGGER.info(f"{self.addon_name} successfully installed")
         return res
 
-    def addon_instance(self):
+    def addon_installation_instance(self):
         try:
             return self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_get(
                 cluster_id=self.cluster_id, addoninstallation_id=self.addon_name
@@ -210,13 +218,15 @@ class ClusterAddOns(Cluster):
         except NotFoundException:
             return
 
-    def addon_instance_sampler(self, wait_timeout=TIMEOUT_10MIN, sleep=SLEEP_1SEC):
+    def addon_instance_sampler(self, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC):
         return TimeoutSampler(
-            wait_timeout=wait_timeout, sleep=sleep, func=self.addon_instance
+            wait_timeout=wait_timeout,
+            sleep=sleep,
+            func=self.addon_installation_instance,
         )
 
     def wait_for_install_state(
-        self, state, wait_timeout=TIMEOUT_10MIN, sleep=SLEEP_1SEC
+        self, state, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC
     ):
         for _addon_instance in self.addon_instance_sampler(
             wait_timeout=wait_timeout, sleep=sleep
@@ -224,7 +234,7 @@ class ClusterAddOns(Cluster):
             if _addon_instance.get("state") == state:
                 return True
 
-    def remove_addon(self, wait=True, wait_timeout=TIMEOUT_10MIN, sleep=SLEEP_1SEC):
+    def remove_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN, sleep=SLEEP_1SEC):
         LOGGER.info(f"Removing addon {self.addon_name}")
         res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_delete(
             cluster_id=self.cluster_id,
