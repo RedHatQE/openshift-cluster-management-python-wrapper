@@ -178,8 +178,8 @@ class ClusterAddOns(Cluster):
         INSTALLING = "installing"
         READY = "ready"
 
-    def __init__(self, client, name, addon_name):
-        super().__init__(client=client, name=name)
+    def __init__(self, client, cluster_name, addon_name):
+        super().__init__(client=client, name=cluster_name)
         self.addon_name = addon_name
 
     def install_addon(self, parameters, wait=True):
