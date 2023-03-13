@@ -5,6 +5,9 @@ from ocm_python_client import ApiException
 from ocm_python_client.exceptions import NotFoundException
 from ocm_python_client.model.add_on import AddOn
 from ocm_python_client.model.add_on_installation import AddOnInstallation
+from ocm_python_client.model.add_on_installation_parameter import (
+    AddOnInstallationParameter,
+)
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 from ocp_utilities.infra import get_client
@@ -168,9 +171,13 @@ class ClusterAddOn(Cluster):
         discard_unknown_keys=True,
         ).client
         cluster_addon = ClusterAddOn(
-            client=_client, name="cluster-name", addon_name="ocm-addon-test-operator"
+            client=_client, cluster_name="cluster-name", addon_name="ocm-addon-test-operator"
         )
-        cluster_addon.install_addon(parameters=AddOnInstallationParameter(id="has-external-resources", value="false"))
+        parameters = [
+            {"id": "has-external-resources", "value": "false"},
+            {"id": "aws-cluster-test-param", "value": "false"},
+        ]
+        cluster_addon.install_addon(parameters=parameters)
         cluster_addon.remove_addon()
 
     """
@@ -188,14 +195,49 @@ class ClusterAddOn(Cluster):
             self.addon_name
         ).to_dict()
 
+    def validate_addon_parameters(self, parameters):
+        _info = self.addon_info()
+        _parameters = _info.get("parameters")
+        if not _parameters and parameters:
+            raise ValueError(f"{self.addon_name} does not take any parameters")
+
+        required_parameters = [
+            param["id"] for param in _parameters["items"] if param["required"] is True
+        ]
+        user_addon_parameters = [param["id"] for param in parameters]
+
+        missing_parameter = []
+        for param in required_parameters:
+            if param not in user_addon_parameters:
+                missing_parameter.append(param)
+
+        if missing_parameter:
+            raise ValueError(
+                f"{self.addon_name} missing some required parameters {missing_parameter}"
+            )
+
     def install_addon(self, parameters=None, wait=True):
+        """
+        Install addon on the cluster
+
+        Args:
+            parameters (list): List of dict
+            wait (bool): True to wait for addon to be installed
+        """
         addon = AddOn(id=self.addon_name)
         _addon_installation_dict = {
             "id": self.addon_name,
             "addon": addon,
         }
         if parameters:
-            _addon_installation_dict["parameters"] = {"items": [parameters]}
+            _parameters = []
+            self.validate_addon_parameters(parameters=parameters)
+            for params in parameters:
+                _parameters.append(
+                    AddOnInstallationParameter(id=params["id"], value=params["value"])
+                )
+
+            _addon_installation_dict["parameters"] = {"items": _parameters}
 
         LOGGER.info(f"Installing addon {self.addon_name}")
         res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
@@ -238,7 +280,7 @@ class ClusterAddOn(Cluster):
             ) in self.addon_installation_instance_sampler(
                 wait_timeout=wait_timeout, sleep=sleep
             ):
-                _state = _addon_installation_instance.get("state")
+                _state = str(_addon_installation_instance.get("state"))
                 if _state == state:
                     return True
         except TimeoutExpiredError:
