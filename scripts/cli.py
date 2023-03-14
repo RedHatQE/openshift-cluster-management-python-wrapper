@@ -2,17 +2,24 @@ import os
 
 import click
 
-from ocm_python_wrapper.cluster import ClusterAddOn
+from ocm_python_wrapper.cluster import TIMEOUT_30MIN, ClusterAddOn
 from ocm_python_wrapper.ocm_client import OCMPythonClient
 
 
 @click.command()
 @click.option("-a", "--addon", help="Addon name to install", required=True)
 @click.option(
+    "--timeout",
+    help="Timeout in seconds to wait for addon to be installed/uninstalled",
+    default=TIMEOUT_30MIN,
+    show_default=True,
+)
+@click.option(
     "-e",
     "--endpoint",
     help="SSO endpoint url",
     default="https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token",
+    show_default=True,
 )
 @click.option(
     "--action",
@@ -29,7 +36,7 @@ from ocm_python_wrapper.ocm_client import OCMPythonClient
 @click.option(
     "-t",
     "--token",
-    help="OCM token",
+    help="OCM token (Taken from oc environment OCM_TOKEN if not passed)",
     required=True,
     default=os.environ.get("OCM_TOKEN"),
 )
@@ -39,8 +46,9 @@ from ocm_python_wrapper.ocm_client import OCMPythonClient
     help="API host",
     default="production",
     type=click.Choice(["stage", "production"]),
+    show_default=True,
 )
-def cli(addon, token, action, parameters, api_host, cluster, endpoint):
+def cli(addon, token, action, parameters, api_host, cluster, endpoint, timeout):
     _client = OCMPythonClient(
         token=token,
         endpoint=endpoint,
@@ -60,10 +68,10 @@ def cli(addon, token, action, parameters, api_host, cluster, endpoint):
             _id, _value = parameter.split("=")
             _parameters.append({"id": _id, "value": _value})
 
-        cluster_addon.install_addon(parameters=_parameters)
+        cluster_addon.install_addon(parameters=_parameters, wait_timeout=timeout)
 
     else:
-        cluster_addon.remove_addon()
+        cluster_addon.uninstall_addon(wait_timeout=timeout)
 
 
 if __name__ == "__main__":
