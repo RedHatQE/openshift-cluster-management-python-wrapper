@@ -35,9 +35,23 @@ image locate at [openshift-cluster-management-python-wrapper](https://quay.io/re
 To pull the image: `podman pull quay.io/myakove/openshift-cluster-management-python-wrapper`
 
 ### Examples
+# Usages
+
+```
+podman run quay.io/myakove/openshift-cluster-management-python-wrapper --help
+```
+
 # Install Addon
 
+```
+podman run quay.io/myakove/openshift-cluster-management-python-wrapper -a ocm-addon-test-operator -c cluster-name -p has-external-resources=false --action install
+```
 
+# Uninstall Addon
+
+```
+podman run quay.io/myakove/openshift-cluster-management-python-wrapper -a ocm-addon-test-operator -c cluster-name -p has-external-resources=false --action uninstall
+```
 
 ## Examples
 ### Client
