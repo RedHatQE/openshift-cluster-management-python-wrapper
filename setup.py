@@ -16,6 +16,7 @@ setup(
         "requests",
         "pyyaml",
         "openshift-python-utilities",
+        "click",
     ],
     python_requires=">=3.6",
 )
