@@ -31,22 +31,22 @@ python setup.py install --user
 ```
 
 ## Container
-image locate at [openshift-cluster-management-python-wrapper](https://quay.io/repository/myakove/openshift-cluster-management-python-wrapper)
-To pull the image: `podman pull quay.io/myakove/openshift-cluster-management-python-wrapper`
+image locate at [openshift-cluster-management-python-wrapper](https://quay.io/repository/<place holder>/openshift-cluster-management-python-wrapper)
+To pull the image: `podman pull quay.io/<place holder>/openshift-cluster-management-python-wrapper`
 
 ### Examples
 # Usages
 
 ```
-podman run quay.io/myakove/openshift-cluster-management-python-wrapper --help
-podman run quay.io/myakove/openshift-cluster-management-python-wrapper install --help
-podman run quay.io/myakove/openshift-cluster-management-python-wrapper uninstall --help
+podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper --help
+podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper install --help
+podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper uninstall --help
 ```
 
 # Install Addon
 
 ```
-podman run quay.io/myakove/openshift-cluster-management-python-wrapper \
+podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper \
     -t $OCM_TOKEN \
     -a ocm-addon-test-operator \
     -c cluster-name \
@@ -58,7 +58,7 @@ podman run quay.io/myakove/openshift-cluster-management-python-wrapper \
 # Uninstall Addon
 
 ```
-podman run quay.io/myakove/openshift-cluster-management-python-wrapper \
+podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper \
     -t $OCM_TOKEN \
     -a ocm-addon-test-operator \
     -c cluster-name \
