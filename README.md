@@ -30,41 +30,6 @@ cd openshift-cluster-management-python-client
 python setup.py install --user
 ```
 
-## Container
-image locate at [openshift-cluster-management-python-wrapper](https://quay.io/repository/<place holder>/openshift-cluster-management-python-wrapper)
-To pull the image: `podman pull quay.io/<place holder>/openshift-cluster-management-python-wrapper`
-
-### Examples
-# Usages
-
-```
-podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper --help
-podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper install --help
-podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper uninstall --help
-```
-
-# Install Addon
-
-```
-podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper \
-    -t $OCM_TOKEN \
-    -a ocm-addon-test-operator \
-    -c cluster-name \
-     install \
-     -p has-external-resources=false \
-     -p aws-cluster-test-param=false
-```
-
-# Uninstall Addon
-
-```
-podman run quay.io/<place holder>/openshift-cluster-management-python-wrapper \
-    -t $OCM_TOKEN \
-    -a ocm-addon-test-operator \
-    -c cluster-name \
-     uninstall
-```
-
 ## Examples
 ### Client
 ```python
