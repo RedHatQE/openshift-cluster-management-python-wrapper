@@ -39,18 +39,30 @@ To pull the image: `podman pull quay.io/myakove/openshift-cluster-management-pyt
 
 ```
 podman run quay.io/myakove/openshift-cluster-management-python-wrapper --help
+podman run quay.io/myakove/openshift-cluster-management-python-wrapper install --help
+podman run quay.io/myakove/openshift-cluster-management-python-wrapper uninstall --help
 ```
 
 # Install Addon
 
 ```
-podman run quay.io/myakove/openshift-cluster-management-python-wrapper -a ocm-addon-test-operator -c cluster-name -p has-external-resources=false --action install
+podman run quay.io/myakove/openshift-cluster-management-python-wrapper \
+    -t $OCM_TOKEN \
+    -a ocm-addon-test-operator \
+    -c cluster-name \
+     install \
+     -p has-external-resources=false \
+     -p aws-cluster-test-param=false
 ```
 
 # Uninstall Addon
 
 ```
-podman run quay.io/myakove/openshift-cluster-management-python-wrapper -a ocm-addon-test-operator -c cluster-name -p has-external-resources=false --action uninstall
+podman run quay.io/myakove/openshift-cluster-management-python-wrapper \
+    -t $OCM_TOKEN \
+    -a ocm-addon-test-operator \
+    -c cluster-name \
+     uninstall
 ```
 
 ## Examples

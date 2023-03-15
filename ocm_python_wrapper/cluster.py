@@ -1,5 +1,3 @@
-import logging
-
 import yaml
 from ocm_python_client import ApiException
 from ocm_python_client.exceptions import NotFoundException
@@ -13,8 +11,9 @@ from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 from ocp_utilities.infra import get_client
 
 from ocm_python_wrapper.exceptions import MissingResourceError
+from ocm_python_wrapper.logger import get_logger
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(__name__)
 TIMEOUT_10MIN = 10 * 60
 TIMEOUT_30MIN = 30 * 60
 SLEEP_1SEC = 1
@@ -42,7 +41,7 @@ class Cluster:
         ).items
         if cluster_list:
             return cluster_list[0].id
-        raise MissingResourceError(name=self.name, kind=self.__class__.__name__)
+        raise MissingResourceError(name=self.name, kind="cluster")
 
     @property
     def instance(self):
