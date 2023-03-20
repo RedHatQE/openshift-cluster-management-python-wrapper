@@ -58,7 +58,11 @@ class Cluster:
 
     @property
     def kubeconfig(self):
-        return yaml.safe_load(self.credentials.kubeconfig)
+        kubeconfig = yaml.safe_load(self.credentials.kubeconfig)
+        # TODO: Remove once https://issues.redhat.com/browse/OCPBUGS-8101 is resolved
+        if self.is_hypershift:
+            del kubeconfig["clusters"][0]["cluster"]["certificate-authority-data"]
+        return kubeconfig
 
     @property
     def ocp_client(self):
@@ -156,6 +160,10 @@ class Cluster:
         except TimeoutExpiredError:
             LOGGER.error("Upgrade policy was not updated")
             raise
+
+    @property
+    def is_hypershift(self):
+        return self.instance.hypershift.enabled is True
 
 
 class ClusterAddOn(Cluster):
