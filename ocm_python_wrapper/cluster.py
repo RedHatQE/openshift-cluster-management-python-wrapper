@@ -180,12 +180,12 @@ class Cluster:
             for sample in TimeoutSampler(
                 wait_timeout=wait_timeout,
                 sleep=SLEEP_1SEC,
-                func=lambda: self.instance,
+                func=lambda: self.exists,
             ):
                 if not sample:
                     return
         except TimeoutExpiredError:
-            LOGGER.error("Timeout waiting for cluster to be deleted")
+            LOGGER.error(f"Timeout waiting for cluster {self.name} to be deleted")
             raise
 
     def wait_for_cluster_ready(self, wait_timeout=TIMEOUT_30MIN):
@@ -196,11 +196,21 @@ class Cluster:
                 sleep=SLEEP_1SEC,
                 func=lambda: self.instance,
             ):
-                if sample and sample.state == "ready":
+                if sample and str(sample.state) == "ready":
                     return True
         except TimeoutExpiredError:
             LOGGER.error("Timeout waiting for cluster to be deleted")
             raise
+
+    @property
+    def exists(self):
+        """
+        Whether self exists on the server
+        """
+        try:
+            return self.instance
+        except NotFoundException:
+            return None
 
 
 class ClusterAddOn(Cluster):
