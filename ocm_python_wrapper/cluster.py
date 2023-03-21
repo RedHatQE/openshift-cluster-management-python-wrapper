@@ -34,7 +34,7 @@ class Cluster:
         self.client = client
         self.name = name
         self.cluster_id = self._cluster_id()
-        self.is_hypershift = self.is_hypershift()
+        self.hosted = self.is_hosted
 
     def _cluster_id(self):
         cluster_list = self.client.api_clusters_mgmt_v1_clusters_get(
@@ -61,7 +61,7 @@ class Cluster:
     def kubeconfig(self):
         kubeconfig = yaml.safe_load(self.credentials.kubeconfig)
         # TODO: Remove once https://issues.redhat.com/browse/OCPBUGS-8101 is resolved
-        if self.is_hypershift:
+        if self.hosted:
             del kubeconfig["clusters"][0]["cluster"]["certificate-authority-data"]
         return kubeconfig
 
@@ -162,7 +162,8 @@ class Cluster:
             LOGGER.error("Upgrade policy was not updated")
             raise
 
-    def is_hypershift(self):
+    @property
+    def is_hosted(self):
         return self.instance.hypershift.enabled is True
 
 
