@@ -157,6 +157,42 @@ class Cluster:
             LOGGER.error("Upgrade policy was not updated")
             raise
 
+    def delete(self, wait=True, timeout=1800):
+        LOGGER.info(f"Delete cluster {self.name}.")
+        self.client.api_clusters_mgmt_v1_clusters_cluster_id_delete(
+            cluster_id=self.cluster_id
+        )
+        if wait:
+            self.wait_for_cluster_deletion(wait_timeout=timeout)
+
+    def wait_for_cluster_deletion(self, wait_timeout=TIMEOUT_30MIN):
+        LOGGER.info(f"Wait for cluster {self.name} to be deleted.")
+        try:
+            for sample in TimeoutSampler(
+                wait_timeout=wait_timeout,
+                sleep=SLEEP_1SEC,
+                func=self.instance,
+            ):
+                if not sample:
+                    return
+        except TimeoutExpiredError:
+            LOGGER.error("Timeout waiting for cluster to be deleted")
+            raise
+
+    def wait_for_cluster_ready(self, wait_timeout=TIMEOUT_30MIN):
+        LOGGER.info(f"Wait for cluster {self.name} to be ready.")
+        try:
+            for sample in TimeoutSampler(
+                wait_timeout=wait_timeout,
+                sleep=SLEEP_1SEC,
+                func=self.instance,
+            ):
+                if sample and sample.state == "ready":
+                    return True
+        except TimeoutExpiredError:
+            LOGGER.error("Timeout waiting for cluster to be deleted")
+            raise
+
 
 class ClusterAddOn(Cluster):
     """
