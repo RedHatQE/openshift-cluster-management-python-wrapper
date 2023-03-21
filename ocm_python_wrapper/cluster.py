@@ -34,6 +34,7 @@ class Cluster:
         self.client = client
         self.name = name
         self.cluster_id = self._cluster_id()
+        self.hypershift = self.is_hypershift
 
     def _cluster_id(self):
         cluster_list = self.client.api_clusters_mgmt_v1_clusters_get(
@@ -58,7 +59,11 @@ class Cluster:
 
     @property
     def kubeconfig(self):
-        return yaml.safe_load(self.credentials.kubeconfig)
+        kubeconfig = yaml.safe_load(self.credentials.kubeconfig)
+        # TODO: Remove once https://issues.redhat.com/browse/OCPBUGS-8101 is resolved
+        if self.hosted:
+            del kubeconfig["clusters"][0]["cluster"]["certificate-authority-data"]
+        return kubeconfig
 
     @property
     def ocp_client(self):
@@ -156,6 +161,10 @@ class Cluster:
         except TimeoutExpiredError:
             LOGGER.error("Upgrade policy was not updated")
             raise
+
+    @property
+    def is_hypershift(self):
+        return self.instance.hypershift.enabled is True
 
     def delete(self, wait=True, timeout=1800):
         LOGGER.info(f"Delete cluster {self.name}.")
