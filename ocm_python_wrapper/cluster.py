@@ -205,7 +205,7 @@ class Cluster:
     @property
     def exists(self):
         """
-        Whether self exists on the server
+        Returns cluster instance if cluster exists else returns None
         """
         try:
             return self.instance
