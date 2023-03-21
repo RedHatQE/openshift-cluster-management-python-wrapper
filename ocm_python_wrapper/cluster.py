@@ -180,7 +180,7 @@ class Cluster:
             for sample in TimeoutSampler(
                 wait_timeout=wait_timeout,
                 sleep=SLEEP_1SEC,
-                func=self.instance,
+                func=lambda: self.instance,
             ):
                 if not sample:
                     return
@@ -194,7 +194,7 @@ class Cluster:
             for sample in TimeoutSampler(
                 wait_timeout=wait_timeout,
                 sleep=SLEEP_1SEC,
-                func=self.instance,
+                func=lambda: self.instance,
             ):
                 if sample and sample.state == "ready":
                     return True
