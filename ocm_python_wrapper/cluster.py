@@ -34,6 +34,7 @@ class Cluster:
         self.client = client
         self.name = name
         self.cluster_id = self._cluster_id()
+        self.is_hypershift = self.instance.hypershift.enabled is True
 
     def _cluster_id(self):
         cluster_list = self.client.api_clusters_mgmt_v1_clusters_get(
@@ -160,10 +161,6 @@ class Cluster:
         except TimeoutExpiredError:
             LOGGER.error("Upgrade policy was not updated")
             raise
-
-    @property
-    def is_hypershift(self):
-        return self.instance.hypershift.enabled is True
 
 
 class ClusterAddOn(Cluster):
