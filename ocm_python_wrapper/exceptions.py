@@ -18,3 +18,7 @@ class MissingResourceError(Exception):
 
     def __str__(self):
         return f"{self.kind} named {self.name} was not found."
+
+
+class ClusterInstallError(Exception):
+    pass
