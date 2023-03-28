@@ -199,7 +199,7 @@ class Cluster:
                 if sample and str(sample.state) == "ready":
                     return True
         except TimeoutExpiredError:
-            LOGGER.error("Timeout waiting for cluster to be deleted")
+            LOGGER.error("Timeout waiting for cluster to be ready")
             raise
 
     @property
