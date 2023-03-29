@@ -61,7 +61,7 @@ class Cluster:
     def kubeconfig(self):
         kubeconfig = yaml.safe_load(self.credentials.kubeconfig)
         # TODO: Remove once https://issues.redhat.com/browse/OCPBUGS-8101 is resolved
-        if self.hosted:
+        if self.hypershift:
             del kubeconfig["clusters"][0]["cluster"]["certificate-authority-data"]
         return kubeconfig
 
