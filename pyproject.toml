@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 88
-target_version = ['py37', 'py38', 'py39', 'py310', "py311"]
+target_version = ['py38', 'py39', 'py310', "py311"]
 exclude = '''
 (
   /(
@@ -15,3 +15,50 @@ exclude = '''
 [tool.isort]
 line_length = 88
 profile = "black"
+
+
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openshift-cluster-management-python-client"
+authors = [
+    {name = "Meni Yakove", email = "myakove@gmail.com"},
+    {name = "Ruth Netser", email = "rnetser@gmail.com"}
+]
+description = "Wrapper around https://github.com/openshift/openshift-cluster-management-python-client"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+keywords = ["Openshift", "OCM"]
+dependencies = [
+    "colorlog",
+    "ocm-python-client",
+    "openshift-python-wrapper",
+    "requests",
+    "pyyaml",
+    "openshift-python-utilities",
+]
+dynamic = ["version"]
+# ...
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.urls]
+Homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-client"
+Download = "https://pypi.org/project/openshift-cluster-management-python-client/"
+"Bug Tracker" = "https://github.com/RedHatQE/oopenshift-cluster-management-python-client/issues"
+Documentation = "https://github.com/rnetser/openshift-cluster-management-python-wrapper/blob/main/README.md"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["ocm_python_wrapper"]
