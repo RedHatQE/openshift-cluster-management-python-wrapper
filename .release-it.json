@@ -39,23 +39,8 @@
     "web": false
   },
   "plugins": {
-    "@j-ulrich/release-it-regex-bumper": {
-      "out": [
-        {
-          "files": [
-            "setup.cfg"
-          ],
-          "search": "\\d+\\.\\d+\\.\\d+",
-          "replace": "{{version}}"
-        },
-        {
-          "files": [
-            "setup.cfg"
-          ],
-          "search": "v\\d+\\.\\d+\\.\\d+",
-          "replace": "v{{version}}"
-        }
-      ]
+    "@release-it/bumper": {
+      "in": "VERSION",
+      "out": "VERSION"
     }
-  }
-}
+  }}
