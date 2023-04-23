@@ -7,6 +7,9 @@ from ocm_python_client.model.add_on_installation_parameter import (
     AddOnInstallationParameter,
 )
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
+from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
+from ocp_resources.resource import ResourceEditor
+from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 from ocp_utilities.infra import get_client
 
@@ -212,6 +215,10 @@ class Cluster:
         except NotFoundException:
             return None
 
+    @property
+    def cloud_provider(self):
+        return self.instance.cloud_provider.id if self.exists else None
+
 
 class ClusterAddOn(Cluster):
     """
@@ -301,6 +308,13 @@ class ClusterAddOn(Cluster):
                 _check_type=False, **_addon_installation_dict
             ),
         )
+
+        if (
+            self.addon_name == "managed-api-service"
+            and "stage" in self.client.api_client.configuration.host
+        ):
+            self.update_rhoam_cluster_storage_config()
+
         if wait:
             self.wait_for_install_state(
                 state=self.State.READY, wait_timeout=wait_timeout
@@ -354,3 +368,20 @@ class ClusterAddOn(Cluster):
                     return True
         LOGGER.info(f"{self.addon_name} was successfully removed")
         return res
+
+    @staticmethod
+    def update_rhoam_cluster_storage_config():
+        def _wait_for_rhmi_resource():
+            for sample in TimeoutSampler(
+                wait_timeout=TIMEOUT_30MIN,
+                sleep=SLEEP_1SEC,
+                func=lambda: RHMI(name="rhoam", namespace="redhat-rhoam-operator"),
+                exceptions_dict=NOT_FOUND_ERROR_EXCEPTION_DICT,
+            ):
+                if sample:
+                    return sample
+
+        rhmi = _wait_for_rhmi_resource()
+        ResourceEditor(
+            patches={rhmi: {"spec": {"useClusterStorage": "false"}}}
+        ).update()
