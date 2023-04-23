@@ -12,9 +12,9 @@ from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 from ocp_utilities.infra import get_client
+from simple_logger.logger import get_logger
 
 from ocm_python_wrapper.exceptions import MissingResourceError
-from ocm_python_wrapper.logger import get_logger
 
 LOGGER = get_logger(__name__)
 TIMEOUT_10MIN = 10 * 60

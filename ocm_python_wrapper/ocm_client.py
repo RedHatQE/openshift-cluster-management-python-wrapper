@@ -5,9 +5,9 @@ from ocm_python_client.api.default_api import DefaultApi
 from ocm_python_client.api_client import ApiClient
 from ocm_python_client.configuration import Configuration
 from ocm_python_client.exceptions import UnauthorizedException
+from simple_logger.logger import get_logger
 
 from ocm_python_wrapper.exceptions import AuthenticationError, EndpointAccessError
-from ocm_python_wrapper.logger import get_logger
 
 LOGGER = get_logger(__name__)
 
