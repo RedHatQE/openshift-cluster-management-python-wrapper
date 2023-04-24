@@ -372,14 +372,17 @@ class ClusterAddOn(Cluster):
     @staticmethod
     def update_rhoam_cluster_storage_config():
         def _wait_for_rhmi_resource():
-            for sample in TimeoutSampler(
+            for rhmi_sample in TimeoutSampler(
                 wait_timeout=TIMEOUT_30MIN,
                 sleep=SLEEP_1SEC,
                 func=lambda: RHMI(name="rhoam", namespace="redhat-rhoam-operator"),
-                exceptions_dict=NOT_FOUND_ERROR_EXCEPTION_DICT,
+                exceptions_dict={
+                    NotImplementedError: [],
+                    **NOT_FOUND_ERROR_EXCEPTION_DICT,
+                },
             ):
-                if sample:
-                    return sample
+                if rhmi_sample and rhmi_sample.exists:
+                    return rhmi_sample
 
         rhmi = _wait_for_rhmi_resource()
         ResourceEditor(
