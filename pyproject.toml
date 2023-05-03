@@ -22,7 +22,7 @@ requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "openshift-cluster-management-python-client"
+name = "openshift-cluster-management-python-wrapper"
 authors = [
     {name = "Meni Yakove", email = "myakove@gmail.com"},
     {name = "Ruth Netser", email = "rnetser@gmail.com"}
@@ -52,9 +52,9 @@ file = "README.md"
 content-type = "text/markdown"
 
 [project.urls]
-Homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-client"
-Download = "https://pypi.org/project/openshift-cluster-management-python-client/"
-"Bug Tracker" = "https://github.com/RedHatQE/oopenshift-cluster-management-python-client/issues"
+Homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper"
+Download = "https://pypi.org/project/openshift-cluster-management-python-wrapper/"
+"Bug Tracker" = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/issues"
 Documentation = "https://github.com/rnetser/openshift-cluster-management-python-wrapper/blob/main/README.md"
 
 [tool.setuptools]
