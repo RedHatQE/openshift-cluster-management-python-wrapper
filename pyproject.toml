@@ -36,7 +36,7 @@ requires-python = ">=3.8"
 keywords = ["Openshift", "OCM"]
 dependencies = [
     "colorlog",
-    "ocm-python-client",
+    "openshift-cluster-management-python-client",
     "openshift-python-wrapper",
     "requests",
     "pyyaml",
