@@ -1,3 +1,6 @@
+import json
+import os
+
 import yaml
 from ocm_python_client import ApiException
 from ocm_python_client.exceptions import NotFoundException
@@ -13,7 +16,8 @@ from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
 from ocp_utilities.infra import get_client
 from simple_logger.logger import get_logger
-
+from ocp_utilities.infra import create_icsp
+from ocp_resources.secret import Secret
 from ocm_python_wrapper.exceptions import MissingResourceError
 
 LOGGER = get_logger(__name__)
@@ -301,6 +305,13 @@ class ClusterAddOn(Cluster):
                 )
 
             _addon_installation_dict["parameters"] = {"items": _parameters}
+        import ipdb
+        ipdb.set_trace()
+        if (
+            self.addon_name == "managed-odh"
+            and "stage" in self.client.api_client.configuration.host
+        ):
+            self.create_rhods_brew_config()
 
         LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
         res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
@@ -389,3 +400,23 @@ class ClusterAddOn(Cluster):
         ResourceEditor(
             patches={rhmi: {"spec": {"useClusterStorage": "false"}}}
         ).update()
+
+    @staticmethod
+    def create_rhods_brew_config():
+        brew_icsp = create_icsp(
+            icsp_name="brew-registry",
+            repository_digest_mirrors=[
+                {
+                    "source": "registry.redhat.io/rhods",
+                    "mirrors": ["brew.registry.redhat.io/rhods"]
+                }
+            ]
+        )
+        brew_pull_secret = Secret(
+            name="pull-secret",
+            namespace="openshift-config",
+            data_dict=json.load(open("/home/obarhaim/ps.json"))
+        )
+        brew_pull_secret.deploy()
+
+        return brew_icsp, brew_pull_secret
