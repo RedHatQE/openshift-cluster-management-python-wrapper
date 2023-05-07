@@ -14,10 +14,9 @@ from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-from ocp_utilities.infra import get_client
+from ocp_utilities.infra import create_icsp, create_update_secret, get_client
 from simple_logger.logger import get_logger
-from ocp_utilities.infra import create_icsp
-from ocp_resources.secret import Secret
+
 from ocm_python_wrapper.exceptions import MissingResourceError
 
 LOGGER = get_logger(__name__)
@@ -305,8 +304,6 @@ class ClusterAddOn(Cluster):
                 )
 
             _addon_installation_dict["parameters"] = {"items": _parameters}
-        import ipdb
-        ipdb.set_trace()
         if (
             self.addon_name == "managed-odh"
             and "stage" in self.client.api_client.configuration.host
@@ -403,20 +400,25 @@ class ClusterAddOn(Cluster):
 
     @staticmethod
     def create_rhods_brew_config():
-        brew_icsp = create_icsp(
+        secret_data_name = "BREW_PULL_SECRET"  # pragma: allowlist secret
+
+        if not os.getenv(secret_data_name):
+            raise KeyError(
+                f"Pull-secret data must be specified in {secret_data_name} environment variable"
+            )
+
+        secret_data_dict = json.loads(os.environ[secret_data_name])
+        create_icsp(
             icsp_name="brew-registry",
             repository_digest_mirrors=[
                 {
                     "source": "registry.redhat.io/rhods",
-                    "mirrors": ["brew.registry.redhat.io/rhods"]
+                    "mirrors": ["brew.registry.redhat.io/rhods"],
                 }
-            ]
+            ],
         )
-        brew_pull_secret = Secret(
-            name="pull-secret",
+        create_update_secret(
+            secret_data_dict=secret_data_dict,
+            name="pull-secret",  # pragma: allowlist secret
             namespace="openshift-config",
-            data_dict=json.load(open("/home/obarhaim/ps.json"))
         )
-        brew_pull_secret.deploy()
-
-        return brew_icsp, brew_pull_secret
