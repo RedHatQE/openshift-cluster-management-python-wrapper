@@ -250,6 +250,7 @@ class ClusterAddOn(Cluster):
     def __init__(self, client, cluster_name, addon_name):
         super().__init__(client=client, name=cluster_name)
         self.addon_name = addon_name
+        self.addon_version = self.addon_info()["version"]["id"]
 
     def addon_info(self):
         return self.client.api_clusters_mgmt_v1_addons_addon_id_get(
@@ -301,7 +302,7 @@ class ClusterAddOn(Cluster):
 
             _addon_installation_dict["parameters"] = {"items": _parameters}
 
-        LOGGER.info(f"Installing addon {self.addon_name}")
+        LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
         res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
             cluster_id=self.cluster_id,
             add_on_installation=AddOnInstallation(
@@ -320,7 +321,7 @@ class ClusterAddOn(Cluster):
                 state=self.State.READY, wait_timeout=wait_timeout
             )
 
-        LOGGER.info(f"{self.addon_name} successfully installed")
+        LOGGER.info(f"{self.addon_name} v{self.addon_version} successfully installed")
         return res
 
     def addon_installation_instance(self):
@@ -355,7 +356,7 @@ class ClusterAddOn(Cluster):
             raise
 
     def uninstall_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN):
-        LOGGER.info(f"Removing addon {self.addon_name}")
+        LOGGER.info(f"Removing addon {self.addon_name} v{self.addon_version}")
         res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_delete(
             cluster_id=self.cluster_id,
             addoninstallation_id=self.addon_name,
@@ -366,7 +367,7 @@ class ClusterAddOn(Cluster):
             ) in self.addon_installation_instance_sampler(wait_timeout=wait_timeout):
                 if not _addon_installation_instance:
                     return True
-        LOGGER.info(f"{self.addon_name} was successfully removed")
+        LOGGER.info(f"{self.addon_name} v{self.addon_version} was successfully removed")
         return res
 
     @staticmethod
