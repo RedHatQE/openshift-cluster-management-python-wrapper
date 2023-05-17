@@ -283,7 +283,7 @@ class ClusterAddOn(Cluster):
         parameters=None,
         wait=True,
         wait_timeout=TIMEOUT_30MIN,
-        brew_pull_secret=None,
+        brew_token=None,
     ):
         """
         Install addon on the cluster
@@ -292,18 +292,7 @@ class ClusterAddOn(Cluster):
             parameters (list): List of dict.
             wait (bool): True to wait for addon to be installed.
             wait_timeout (int): Timeout in seconds to wait for addon to be installed.
-            brew_pull_secret (dict): secret data dict for pulling images from brew registry,
-                example: {
-                    "auths":{
-                    <registry_name>:
-                        {"auth": <auth_token>,
-                        "email": <auth_email>},
-                    ...,
-                    <registry_name>:
-                        {"auth": <auth_token>,
-                        "email": <auth_email>}
-                    }
-                }
+            brew_token (str): brew token for creating brew pull secret
         """
         addon = AddOn(id=self.addon_name)
         _addon_installation_dict = {
@@ -323,7 +312,7 @@ class ClusterAddOn(Cluster):
             self.addon_name == "managed-odh"
             and "stage" in self.client.api_client.configuration.host
         ):
-            self.create_rhods_brew_config(secret_data_dict=brew_pull_secret)
+            self.create_rhods_brew_config(brew_token=brew_token)
 
         LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
         res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
@@ -414,7 +403,7 @@ class ClusterAddOn(Cluster):
         ).update()
 
     @staticmethod
-    def create_rhods_brew_config(secret_data_dict):
+    def create_rhods_brew_config(brew_token):
         create_icsp(
             icsp_name="brew-registry",
             repository_digest_mirrors=[
@@ -424,6 +413,7 @@ class ClusterAddOn(Cluster):
                 }
             ],
         )
+        secret_data_dict = {"auths": {"brew.registry.redhat.io": {"auth": brew_token}}}
         create_update_secret(
             secret_data_dict=secret_data_dict,
             name="pull-secret",  # pragma: allowlist secret
