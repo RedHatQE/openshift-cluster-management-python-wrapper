@@ -11,7 +11,7 @@ from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-from ocp_utilities.infra import get_client
+from ocp_utilities.infra import create_icsp, create_update_secret, get_client
 from simple_logger.logger import get_logger
 
 from ocm_python_wrapper.exceptions import MissingResourceError
@@ -278,7 +278,13 @@ class ClusterAddOn(Cluster):
                 f"{self.addon_name} missing some required parameters {missing_parameter}"
             )
 
-    def install_addon(self, parameters=None, wait=True, wait_timeout=TIMEOUT_30MIN):
+    def install_addon(
+        self,
+        parameters=None,
+        wait=True,
+        wait_timeout=TIMEOUT_30MIN,
+        brew_pull_secret=None,
+    ):
         """
         Install addon on the cluster
 
@@ -286,6 +292,18 @@ class ClusterAddOn(Cluster):
             parameters (list): List of dict.
             wait (bool): True to wait for addon to be installed.
             wait_timeout (int): Timeout in seconds to wait for addon to be installed.
+            brew_pull_secret (dict): secret data dict for pulling images from brew registry,
+                example: {
+                    "auths":{
+                    <registry_name>:
+                        {"auth": <auth_token>,
+                        "email": <auth_email>},
+                    ...,
+                    <registry_name>:
+                        {"auth": <auth_token>,
+                        "email": <auth_email>}
+                    }
+                }
         """
         addon = AddOn(id=self.addon_name)
         _addon_installation_dict = {
@@ -301,6 +319,11 @@ class ClusterAddOn(Cluster):
                 )
 
             _addon_installation_dict["parameters"] = {"items": _parameters}
+        if (
+            self.addon_name == "managed-odh"
+            and "stage" in self.client.api_client.configuration.host
+        ):
+            self.create_rhods_brew_config(secret_data_dict=brew_pull_secret)
 
         LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
         res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
@@ -389,3 +412,20 @@ class ClusterAddOn(Cluster):
         ResourceEditor(
             patches={rhmi: {"spec": {"useClusterStorage": "false"}}}
         ).update()
+
+    @staticmethod
+    def create_rhods_brew_config(secret_data_dict):
+        create_icsp(
+            icsp_name="brew-registry",
+            repository_digest_mirrors=[
+                {
+                    "source": "registry.redhat.io/rhods",
+                    "mirrors": ["brew.registry.redhat.io/rhods"],
+                }
+            ],
+        )
+        create_update_secret(
+            secret_data_dict=secret_data_dict,
+            name="pull-secret",  # pragma: allowlist secret
+            namespace="openshift-config",
+        )
