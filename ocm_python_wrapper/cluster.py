@@ -259,15 +259,6 @@ class ClusterAddOn(Cluster):
         ).to_dict()
 
     def validate_addon_parameters(self, parameters):
-        """Checks user input for addon parameters.
-        Args:
-            parameters (List) : List of dict, user parameters input.
-
-        Raises:
-            ValueError: When a required parameter is missing,
-                        or when parameters are passed but not needed for addon.
-        """
-
         _info = self.addon_info()
         _parameters = _info.get("parameters")
         if not _parameters and parameters:
