@@ -275,10 +275,10 @@ class ClusterAddOn(Cluster):
             if param not in user_addon_parameters:
                 missing_parameter.append(param)
 
-        # if missing_parameter:
-        #     raise ValueError(
-        #         f"{self.addon_name} missing some required parameters {missing_parameter}"
-        #     )
+        if missing_parameter:
+            raise ValueError(
+                f"{self.addon_name} missing some required parameters {missing_parameter}"
+            )
 
     def install_addon(
         self,
