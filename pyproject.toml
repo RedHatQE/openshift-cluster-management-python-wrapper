@@ -41,6 +41,7 @@ dependencies = [
     "requests",
     "pyyaml",
     "openshift-python-utilities",
+    "rosa-pyhon-client"
 ]
 dynamic = ["version"]
 # ...
