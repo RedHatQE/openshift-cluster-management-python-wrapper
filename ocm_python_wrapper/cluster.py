@@ -258,10 +258,10 @@ class ClusterAddOn(Cluster):
             self.addon_name
         ).to_dict()
 
-    def validate_addon_parameters(self, user_parameters):
+    def validate_addon_parameters(self, parameters):
         """Checks user input for addon parameters.
         Args:
-            user_parameters (List) : List of dict, user parameters input.
+            parameters (List) : List of dict, user parameters input.
 
         Raises:
             ValueError: When a required parameter is missing,
@@ -270,13 +270,13 @@ class ClusterAddOn(Cluster):
 
         _info = self.addon_info()
         _parameters = _info.get("parameters")
-        if not _parameters and user_parameters:
+        if not _parameters and parameters:
             raise ValueError(f"{self.addon_name} does not take any parameters")
 
         required_parameters = [
             param["id"] for param in _parameters["items"] if param["required"] is True
         ]
-        user_addon_parameters = [param["id"] for param in user_parameters]
+        user_addon_parameters = [param["id"] for param in parameters]
 
         missing_parameter = []
         for param in required_parameters:
@@ -316,7 +316,7 @@ class ClusterAddOn(Cluster):
         }
         if parameters:
             _parameters = []
-            self.validate_addon_parameters(user_parameters=parameters)
+            self.validate_addon_parameters(parameters=parameters)
             for params in parameters:
                 _parameters.append(
                     AddOnInstallationParameter(id=params["id"], value=params["value"])
