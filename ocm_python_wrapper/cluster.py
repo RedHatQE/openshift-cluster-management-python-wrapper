@@ -257,16 +257,25 @@ class ClusterAddOn(Cluster):
             self.addon_name
         ).to_dict()
 
-    def validate_addon_parameters(self, parameters):
+    def validate_addon_parameters(self, user_parameters):
+        """Checks user input for addon parameters.
+        Args:
+            user_parameters (List) : List of dict, user parameters input.
+
+        Raises:
+            ValueError: When a required parameter is missing,
+                        or when parameters are passed but not needed for addon.
+        """
+
         _info = self.addon_info()
         _parameters = _info.get("parameters")
-        if not _parameters and parameters:
+        if not _parameters and user_parameters:
             raise ValueError(f"{self.addon_name} does not take any parameters")
 
         required_parameters = [
             param["id"] for param in _parameters["items"] if param["required"] is True
         ]
-        user_addon_parameters = [param["id"] for param in parameters]
+        user_addon_parameters = [param["id"] for param in user_parameters]
 
         missing_parameter = []
         for param in required_parameters:
@@ -284,6 +293,7 @@ class ClusterAddOn(Cluster):
         wait=True,
         wait_timeout=TIMEOUT_30MIN,
         brew_token=None,
+        rosa=False,
     ):
         """
         Install addon on the cluster
@@ -293,6 +303,8 @@ class ClusterAddOn(Cluster):
             wait (bool): True to wait for addon to be installed.
             wait_timeout (int): Timeout in seconds to wait for addon to be installed.
             brew_token (str): brew token for creating brew pull secret
+            rosa (bool): Use ROSA cli if True else use OCM API
+
         """
         addon = AddOn(id=self.addon_name)
         _addon_installation_dict = {
@@ -301,7 +313,7 @@ class ClusterAddOn(Cluster):
         }
         if parameters:
             _parameters = []
-            self.validate_addon_parameters(parameters=parameters)
+            self.validate_addon_parameters(user_parameters=parameters)
             for params in parameters:
                 _parameters.append(
                     AddOnInstallationParameter(id=params["id"], value=params["value"])
@@ -315,12 +327,20 @@ class ClusterAddOn(Cluster):
             self.create_rhods_brew_config(brew_token=brew_token)
 
         LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
-        res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
-            cluster_id=self.cluster_id,
-            add_on_installation=AddOnInstallation(
-                _check_type=False, **_addon_installation_dict
-            ),
-        )
+        if rosa:
+            params_command = ""
+            for parameter in parameters:
+                params_command += f" --{parameter['id']} {parameter['value']}"
+            res = rosa.cli.execute(
+                command=f"install addon {self.addon_name} -c {self.name} {params_command} -y"
+            )
+        else:
+            res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
+                cluster_id=self.cluster_id,
+                add_on_installation=AddOnInstallation(
+                    _check_type=False, **_addon_installation_dict
+                ),
+            )
 
         if (
             self.addon_name == "managed-api-service"
@@ -367,12 +387,25 @@ class ClusterAddOn(Cluster):
             )
             raise
 
-    def uninstall_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN):
+    def uninstall_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN, rosa=False):
+        """
+        Uninstall addon on the cluster
+
+        Args:
+            wait (bool): True to wait for addon to be installed.
+            wait_timeout (int): Timeout in seconds to wait for addon to be installed.
+            rosa (bool): Use ROSA cli if True else use OCM API
+        """
         LOGGER.info(f"Removing addon {self.addon_name} v{self.addon_version}")
-        res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_delete(
-            cluster_id=self.cluster_id,
-            addoninstallation_id=self.addon_name,
-        )
+        if rosa:
+            res = rosa.cli.execute(
+                command=f"uninstall addon {self.addon_name} -c {self.name} -y"
+            )
+        else:
+            res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_delete(
+                cluster_id=self.cluster_id,
+                addoninstallation_id=self.addon_name,
+            )
         if wait:
             for (
                 _addon_installation_instance
