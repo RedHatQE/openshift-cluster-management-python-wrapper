@@ -1,5 +1,6 @@
 import rosa.cli as rosa_cli
 import yaml
+from clouds.aws.aws_roles.aws_roles import create_or_update_role_policy
 from ocm_python_client import ApiException
 from ocm_python_client.exceptions import NotFoundException
 from ocm_python_client.model.add_on import AddOn
@@ -274,10 +275,10 @@ class ClusterAddOn(Cluster):
             if param not in user_addon_parameters:
                 missing_parameter.append(param)
 
-        if missing_parameter:
-            raise ValueError(
-                f"{self.addon_name} missing some required parameters {missing_parameter}"
-            )
+        # if missing_parameter:
+        #     raise ValueError(
+        #         f"{self.addon_name} missing some required parameters {missing_parameter}"
+        #     )
 
     def install_addon(
         self,
@@ -340,6 +341,13 @@ class ClusterAddOn(Cluster):
             self.addon_name == "managed-api-service"
             and "stage" in self.client.api_client.configuration.host
         ):
+            # Create role-policy for RHOAM installation:
+            # https://access.redhat.com/documentation/en-us/red_hat_openshift_api_management/1/guide/53dfb804-2038-4545-b917-2cb01a09ef98#_b5f80fce-73cb-4869-aa16-763bbe09896a:~:text=In%20the%20AWS%20CLI%2C%20create%20a%20policy%20for%20SRE%20Support.%20Enter%20the%20following%3A
+            create_or_update_role_policy(
+                role_name="ManagedOpenShift-Support-Role",
+                policy_name="rhoam-sre-support-policy",
+                policy_document_path="manifests/managed-api-service-policy.json",
+            )
             self.update_rhoam_cluster_storage_config()
 
         if wait:
