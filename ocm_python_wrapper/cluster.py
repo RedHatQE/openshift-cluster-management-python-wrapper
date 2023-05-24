@@ -1,3 +1,4 @@
+import os
 from importlib.util import find_spec
 
 import rosa.cli as rosa_cli
@@ -345,8 +346,13 @@ class ClusterAddOn(Cluster):
         ):
             # Create role-policy for RHOAM installation:
             # https://access.redhat.com/documentation/en-us/red_hat_openshift_api_management/1/guide/53dfb804-2038-4545-b917-2cb01a09ef98#_b5f80fce-73cb-4869-aa16-763bbe09896a:~:text=In%20the%20AWS%20CLI%2C%20create%20a%20policy%20for%20SRE%20Support.%20Enter%20the%20following%3A
-            path = find_spec("ocm_python_wrapper").submodule_search_locations[0]
-            with open(path + "/manifests/managed-api-service-policy.json", "r") as fd:
+            with open(
+                os.path.join(
+                    find_spec("ocm_python_wrapper").submodule_search_locations[0],
+                    "manifests/managed-api-service-policy.json",
+                ),
+                "r",
+            ) as fd:
                 policy_document = fd.read()
             create_or_update_role_policy(
                 role_name="ManagedOpenShift-Support-Role",
