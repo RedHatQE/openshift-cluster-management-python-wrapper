@@ -1,5 +1,6 @@
 import rosa.cli as rosa_cli
 import yaml
+from benedict import benedict
 from ocm_python_client import ApiException
 from ocm_python_client.exceptions import NotFoundException
 from ocm_python_client.model.add_on import AddOn
@@ -258,30 +259,97 @@ class ClusterAddOn(Cluster):
             self.addon_name
         ).to_dict()
 
-    def validate_addon_parameters(self, parameters):
+    def validate_addon_parameters(self, user_parameters, use_api_defaults=True):
+        """Checks user input for addon parameters.
+
+        Args:
+            user_parameters (List) : User parameter input set with values.
+            use_api_defaults (bool) : If true, set required parameter with default value to not fail as missing.
+
+        Returns: Updated parameters (if default values updated) to provide for installation.
+
+        Raises:
+            ValueError: When a required parameter is missing,
+                        or when parameters are passed but not needed for addon.
+        """
+
+        def _get_required_cluster_parameters(parameters):
+            """Filter cluster-related ``addon parameters``
+
+            Args: parameters (dict) : Addons parameters from Clusters Management
+            ``cluster_mgmt_v1_addons_addon_id`` API.
+
+            Returns:
+                Dict of parameters corresponding to the clusters the current configuration and
+                              required for installation.
+                example:
+                _required_parameters = {'cidr-range': {'default_value': '10.1.0.0/26'}, 'addon_parameter': {
+                        'default_value': ''}, ..}
+
+            """
+            _required_parameters = {}
+
+            for param in parameters["items"]:
+                if param["required"] is True:
+                    param_conditions = [
+                        con["data"]
+                        for con in param["conditions"]
+                        if con["resource"] == "cluster"
+                    ]
+                    if param_conditions:
+                        for condition, condition_value in param_conditions[0].items():
+                            cluster_condition_value = benedict(
+                                self.instance.to_dict(), keypath_separator="."
+                            ).get(condition)
+                            if not (
+                                (
+                                    isinstance(condition_value, list)
+                                    and cluster_condition_value in condition_value
+                                )
+                                or cluster_condition_value == condition_value
+                            ):
+                                break
+                        else:
+                            _required_parameters[param["id"]] = {
+                                "default_value": param["default_value"]
+                            }
+
+            return _required_parameters
+
         _info = self.addon_info()
-        _parameters = _info.get("parameters")
-        if not _parameters and parameters:
+        addon_parameters = _info.get("parameters")
+        if not addon_parameters and user_parameters:
             raise ValueError(f"{self.addon_name} does not take any parameters")
 
-        required_parameters = [
-            param["id"] for param in _parameters["items"] if param["required"] is True
-        ]
-        user_addon_parameters = [param["id"] for param in parameters]
+        required_parameters = _get_required_cluster_parameters(
+            parameters=addon_parameters
+        )
 
+        user_addon_parameters = [param["id"] for param in user_parameters]
         missing_parameter = []
-        for param in required_parameters:
+
+        for param, param_dict in required_parameters.items():
             if param not in user_addon_parameters:
-                missing_parameter.append(param)
+                if use_api_defaults and required_parameters[param]["default_value"]:
+                    user_parameters.append(
+                        {
+                            "id": param,
+                            "value": required_parameters[param]["default_value"],
+                        }
+                    )
+                else:
+                    missing_parameter.append(param)
 
         if missing_parameter:
             raise ValueError(
                 f"{self.addon_name} missing some required parameters {missing_parameter}"
             )
+        return user_parameters
 
     def install_addon(
         self,
         parameters=None,
+        use_api_defaults=True,
         wait=True,
         wait_timeout=TIMEOUT_30MIN,
         brew_token=None,
@@ -292,6 +360,7 @@ class ClusterAddOn(Cluster):
 
         Args:
             parameters (list): List of dict.
+            use_api_defaults (bool): Use addon parameter default value if not provided.
             wait (bool): True to wait for addon to be installed.
             wait_timeout (int): Timeout in seconds to wait for addon to be installed.
             brew_token (str): brew token for creating brew pull secret
@@ -305,9 +374,13 @@ class ClusterAddOn(Cluster):
             "id": self.addon_name,
             "addon": addon,
         }
+
+        parameters = self.validate_addon_parameters(
+            user_parameters=parameters, use_api_defaults=use_api_defaults
+        )
+
         if parameters:
             _parameters = []
-            self.validate_addon_parameters(parameters=parameters)
             for params in parameters:
                 _parameters.append(
                     AddOnInstallationParameter(id=params["id"], value=params["value"])
