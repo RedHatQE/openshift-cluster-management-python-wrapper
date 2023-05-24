@@ -349,22 +349,22 @@ class ClusterAddOn(Cluster):
     def install_addon(
         self,
         parameters=None,
-        use_api_defaults=True,
         wait=True,
         wait_timeout=TIMEOUT_30MIN,
         brew_token=None,
         rosa=False,
+        use_api_defaults=True,
     ):
         """
         Install addon on the cluster
 
         Args:
             parameters (list): List of dict.
-            use_api_defaults (bool): Use addon parameter default value if not provided.
             wait (bool): True to wait for addon to be installed.
             wait_timeout (int): Timeout in seconds to wait for addon to be installed.
             brew_token (str): brew token for creating brew pull secret
             rosa (bool): Use ROSA cli if True else use OCM API
+            use_api_defaults (bool): Use addon parameter default value if not provided.
 
          Returns:
             AddOnInstallation or list: list of stdout responses if rosa is True, else AddOnInstallation

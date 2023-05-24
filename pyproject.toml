@@ -42,7 +42,8 @@ dependencies = [
     "pyyaml",
     "openshift-python-utilities",
     "rosa-python-client",
-    "python-simple-logger"
+    "python-simple-logger",
+    "python-benedict",
 ]
 dynamic = ["version"]
 # ...
