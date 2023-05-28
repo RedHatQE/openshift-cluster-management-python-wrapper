@@ -1,3 +1,4 @@
+import rosa.cli as rosa_cli
 import yaml
 from ocm_python_client import ApiException
 from ocm_python_client.exceptions import NotFoundException
@@ -11,10 +12,10 @@ from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
-from ocp_utilities.infra import get_client
+from ocp_utilities.infra import create_icsp, create_update_secret, get_client
+from simple_logger.logger import get_logger
 
 from ocm_python_wrapper.exceptions import MissingResourceError
-from ocm_python_wrapper.logger import get_logger
 
 LOGGER = get_logger(__name__)
 TIMEOUT_10MIN = 10 * 60
@@ -250,6 +251,7 @@ class ClusterAddOn(Cluster):
     def __init__(self, client, cluster_name, addon_name):
         super().__init__(client=client, name=cluster_name)
         self.addon_name = addon_name
+        self.addon_version = self.addon_info()["version"]["id"]
 
     def addon_info(self):
         return self.client.api_clusters_mgmt_v1_addons_addon_id_get(
@@ -277,7 +279,14 @@ class ClusterAddOn(Cluster):
                 f"{self.addon_name} missing some required parameters {missing_parameter}"
             )
 
-    def install_addon(self, parameters=None, wait=True, wait_timeout=TIMEOUT_30MIN):
+    def install_addon(
+        self,
+        parameters=None,
+        wait=True,
+        wait_timeout=TIMEOUT_30MIN,
+        brew_token=None,
+        rosa=False,
+    ):
         """
         Install addon on the cluster
 
@@ -285,6 +294,11 @@ class ClusterAddOn(Cluster):
             parameters (list): List of dict.
             wait (bool): True to wait for addon to be installed.
             wait_timeout (int): Timeout in seconds to wait for addon to be installed.
+            brew_token (str): brew token for creating brew pull secret
+            rosa (bool): Use ROSA cli if True else use OCM API
+
+         Returns:
+            AddOnInstallation or list: list of stdout responses if rosa is True, else AddOnInstallation
         """
         addon = AddOn(id=self.addon_name)
         _addon_installation_dict = {
@@ -300,14 +314,27 @@ class ClusterAddOn(Cluster):
                 )
 
             _addon_installation_dict["parameters"] = {"items": _parameters}
+        if (
+            self.addon_name == "managed-odh"
+            and "stage" in self.client.api_client.configuration.host
+        ):
+            self.create_rhods_brew_config(brew_token=brew_token)
 
-        LOGGER.info(f"Installing addon {self.addon_name}")
-        res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
-            cluster_id=self.cluster_id,
-            add_on_installation=AddOnInstallation(
-                _check_type=False, **_addon_installation_dict
-            ),
-        )
+        LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
+        if rosa:
+            params_command = ""
+            for parameter in parameters:
+                params_command += f" --{parameter['id']} {parameter['value']}"
+            res = rosa_cli.execute(
+                command=f"install addon {self.addon_name} --cluster {self.name} {params_command}"
+            )
+        else:
+            res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
+                cluster_id=self.cluster_id,
+                add_on_installation=AddOnInstallation(
+                    _check_type=False, **_addon_installation_dict
+                ),
+            )
 
         if (
             self.addon_name == "managed-api-service"
@@ -320,7 +347,7 @@ class ClusterAddOn(Cluster):
                 state=self.State.READY, wait_timeout=wait_timeout
             )
 
-        LOGGER.info(f"{self.addon_name} successfully installed")
+        LOGGER.info(f"{self.addon_name} v{self.addon_version} successfully installed")
         return res
 
     def addon_installation_instance(self):
@@ -354,34 +381,71 @@ class ClusterAddOn(Cluster):
             )
             raise
 
-    def uninstall_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN):
-        LOGGER.info(f"Removing addon {self.addon_name}")
-        res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_delete(
-            cluster_id=self.cluster_id,
-            addoninstallation_id=self.addon_name,
-        )
+    def uninstall_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN, rosa=False):
+        """
+        Uninstall addon on the cluster
+
+        Args:
+            wait (bool): True to wait for addon to be installed.
+            wait_timeout (int): Timeout in seconds to wait for addon to be installed.
+            rosa (bool): Use ROSA cli if True else use OCM API
+
+        Returns:
+            None or list: list of stdout responses if rosa is True, else None.
+        """
+        LOGGER.info(f"Removing addon {self.addon_name} v{self.addon_version}")
+        if rosa:
+            res = rosa_cli.execute(
+                command=f"uninstall addon {self.addon_name} --cluster {self.name}"
+            )
+        else:
+            res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_delete(
+                cluster_id=self.cluster_id,
+                addoninstallation_id=self.addon_name,
+            )
         if wait:
             for (
                 _addon_installation_instance
             ) in self.addon_installation_instance_sampler(wait_timeout=wait_timeout):
                 if not _addon_installation_instance:
                     return True
-        LOGGER.info(f"{self.addon_name} was successfully removed")
+        LOGGER.info(f"{self.addon_name} v{self.addon_version} was successfully removed")
         return res
 
     @staticmethod
     def update_rhoam_cluster_storage_config():
         def _wait_for_rhmi_resource():
-            for sample in TimeoutSampler(
+            for rhmi_sample in TimeoutSampler(
                 wait_timeout=TIMEOUT_30MIN,
                 sleep=SLEEP_1SEC,
                 func=lambda: RHMI(name="rhoam", namespace="redhat-rhoam-operator"),
-                exceptions_dict=NOT_FOUND_ERROR_EXCEPTION_DICT,
+                exceptions_dict={
+                    NotImplementedError: [],
+                    **NOT_FOUND_ERROR_EXCEPTION_DICT,
+                },
             ):
-                if sample:
-                    return sample
+                if rhmi_sample and rhmi_sample.exists:
+                    return rhmi_sample
 
         rhmi = _wait_for_rhmi_resource()
         ResourceEditor(
             patches={rhmi: {"spec": {"useClusterStorage": "false"}}}
         ).update()
+
+    @staticmethod
+    def create_rhods_brew_config(brew_token):
+        create_icsp(
+            icsp_name="brew-registry",
+            repository_digest_mirrors=[
+                {
+                    "source": "registry.redhat.io/rhods",
+                    "mirrors": ["brew.registry.redhat.io/rhods"],
+                }
+            ],
+        )
+        secret_data_dict = {"auths": {"brew.registry.redhat.io": {"auth": brew_token}}}
+        create_update_secret(
+            secret_data_dict=secret_data_dict,
+            name="pull-secret",  # pragma: allowlist secret
+            namespace="openshift-config",
+        )
