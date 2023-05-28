@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rds:DescribeDBInstances",
+                "rds:DescribeDBClusters",
+                "rds:DescribeGlobalClusters",
+                "rds:ModifyDBInstance",
+                "rds:DeleteDBInstance",
+                "rds:DescribeDBSnapshots",
+                "rds:RestoreDBInstanceFromDBSnapshot",
+                "elasticache:DescribeReplicationGroups",
+                "elasticache:ModifyReplicationGroup",
+                "elasticache:DescribeSnapshots",
+                "elasticache:CreateReplicationGroup",
+                "elasticache:DescribeCacheClusters",
+                "elasticache:DeleteReplicationGroup",
+                "sts:GetCallerIdentity",
+                "tag:TagResources"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
