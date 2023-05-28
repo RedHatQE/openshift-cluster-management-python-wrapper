@@ -43,6 +43,8 @@ dependencies = [
     "openshift-python-utilities",
     "rosa-python-client",
     "python-simple-logger",
+    "redhat-qe-cloud-tools",
+    "importlib",
     "python-benedict",
 ]
 dynamic = ["version"]
@@ -65,3 +67,6 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 include = ["ocm_python_wrapper"]
+
+[tool.setuptools.package-data]
+ocm_python_wrapper = ["manifests/*.json"]
