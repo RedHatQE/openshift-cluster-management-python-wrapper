@@ -318,7 +318,6 @@ class ClusterAddOn(Cluster):
                         _required_parameters[param["id"]] = {
                             "default_value": param.get("default_value")
                         }
-
             return _required_parameters
 
         def _check_param_conditions(_clusters_dict, _condition, _condition_value):
@@ -408,7 +407,6 @@ class ClusterAddOn(Cluster):
             and "stage" in self.client.api_client.configuration.host
         ):
             self.create_rhods_brew_config(brew_token=brew_token)
-        exit()
         LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
         if rosa:
             params_command = ""
