@@ -273,7 +273,6 @@ class ClusterAddOn(Cluster):
                 Example:
                     parameters = [{"id": "has-external-resources", "value": "false"},
                                     {"id": "aws-cluster-test-param", "value": "false"},]
-
             use_api_defaults (bool): If true, set required parameter (which are not part of `user_parameters`) with
                                             default value to not fail as missing.
 
@@ -304,8 +303,8 @@ class ClusterAddOn(Cluster):
             for param in _addon_parameters["items"]:
                 param_conditions = [
                     con["data"]
-                    for con in param["conditions"]
-                    if param["required"] is True and con["resource"] == "cluster"
+                    for con in (param.get("conditions") or [])
+                    if param.get("required") and con["resource"] == "cluster"
                 ]
                 if param_conditions:
                     for condition, condition_value in param_conditions[0].items():
@@ -351,17 +350,16 @@ class ClusterAddOn(Cluster):
         required_parameters = _get_required_cluster_parameters(
             _addon_parameters=addon_parameters
         )
-
         user_addon_parameters = [param["id"] for param in user_parameters]
         missing_parameter = []
 
         for param, param_dict in required_parameters.items():
             if param not in user_addon_parameters:
-                if use_api_defaults and required_parameters[param]["default_value"]:
+                if use_api_defaults and param_dict["default_value"]:
                     user_parameters.append(
                         {
                             "id": param,
-                            "value": required_parameters[param]["default_value"],
+                            "value": param_dict["default_value"],
                         }
                     )
                 else:
