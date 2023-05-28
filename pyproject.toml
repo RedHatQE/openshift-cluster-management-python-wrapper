@@ -45,6 +45,7 @@ dependencies = [
     "python-simple-logger",
     "redhat-qe-cloud-tools",
     "importlib",
+    "python-benedict",
 ]
 dynamic = ["version"]
 # ...
