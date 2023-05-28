@@ -311,7 +311,7 @@ class ClusterAddOn(Cluster):
                                 break
                         else:
                             _required_parameters[param["id"]] = {
-                                "default_value": param["default_value"]
+                                "default_value": param.get("default_value")
                             }
 
             return _required_parameters
