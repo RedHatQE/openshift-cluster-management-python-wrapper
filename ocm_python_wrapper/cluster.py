@@ -3,7 +3,7 @@ from importlib.util import find_spec
 
 import rosa.cli as rosa_cli
 import yaml
-from clouds.aws.aws_roles.aws_roles import create_or_update_role_policy
+from clouds.aws.roles.roles import create_or_update_role_policy
 from ocm_python_client import ApiException
 from ocm_python_client.exceptions import NotFoundException
 from ocm_python_client.model.add_on import AddOn
