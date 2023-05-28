@@ -302,16 +302,16 @@ class ClusterAddOn(Cluster):
 
             for param in _addon_parameters["items"]:
                 param_conditions = [
-                    con["data"]
-                    for con in (param.get("conditions") or [])
-                    if param.get("required") and con["resource"] == "cluster"
+                    condition["data"]
+                    for condition in param.get("conditions", [])
+                    if param.get("required") and condition["resource"] == "cluster"
                 ]
                 if param_conditions:
                     for condition, condition_value in param_conditions[0].items():
-                        if not _check_param_conditions(
-                            _clusters_dict=self.instance.to_dict(),
-                            _condition=condition,
-                            _condition_value=condition_value,
+                        if not self.check_param_conditions(
+                            clusters_dict=self.instance.to_dict(),
+                            condition=condition,
+                            condition_value=condition_value,
                         ):
                             break
                     else:
@@ -319,27 +319,6 @@ class ClusterAddOn(Cluster):
                             "default_value": param.get("default_value")
                         }
             return _required_parameters
-
-        def _check_param_conditions(_clusters_dict, _condition, _condition_value):
-            """
-            Check if parameter conditions met with cluster configuration
-
-            Args:
-                _clusters_dict (dict): Cluster instance dict
-                _condition (str): Condition key to check
-                _condition_value (str): Condition expected value
-
-            Returns:
-                Bool: True if cluster instance match with condition, else false
-
-            """
-            cluster_condition_value = benedict(
-                _clusters_dict, keypath_separator="."
-            ).get(_condition)
-            return (
-                isinstance(_condition_value, list)
-                and cluster_condition_value in _condition_value
-            ) or cluster_condition_value == _condition_value
 
         _info = self.addon_info()
         addon_parameters = _info.get("parameters")
@@ -561,3 +540,25 @@ class ClusterAddOn(Cluster):
             name="pull-secret",  # pragma: allowlist secret
             namespace="openshift-config",
         )
+
+    @staticmethod
+    def check_param_conditions(clusters_dict, condition, condition_value):
+        """
+        Check if parameter conditions met with cluster configuration
+
+        Args:
+            clusters_dict (dict): Cluster instance dict
+            condition (str): Condition key to check
+            condition_value (str): Condition expected value
+
+        Returns:
+            Bool: True if cluster instance match with condition, else False
+
+        """
+        cluster_condition_value = benedict(clusters_dict, keypath_separator=".").get(
+            condition
+        )
+        return (
+            isinstance(condition_value, list)
+            and cluster_condition_value in condition_value
+        ) or cluster_condition_value == condition_value
