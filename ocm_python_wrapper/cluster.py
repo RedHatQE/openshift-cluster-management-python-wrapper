@@ -259,29 +259,37 @@ class ClusterAddOn(Cluster):
             self.addon_name
         ).to_dict()
 
-    def validate_addon_parameters(self, user_parameters, use_api_defaults=True):
-        """Checks user input for addon parameters.
+    def validate_and_update_addon_parameters(
+        self, user_parameters, use_api_defaults=True
+    ):
+        """Validate and update user input parameters against API's conditions and requirements.
 
         Args:
-            user_parameters (List) : User parameter input set with values.
-            use_api_defaults (bool) : If true, set required parameter with default value to not fail as missing.
+            user_parameters (List) : User parameters
+                Example:
+                    parameters = [{"id": "has-external-resources", "value": "false"},
+                                    {"id": "aws-cluster-test-param", "value": "false"},]
 
-        Returns: Updated parameters (if default values updated) to provide for installation.
+            use_api_defaults (bool) : If true, set required parameter (which are not part of `user_parameters`) with
+                                            default value to not fail as missing.
+
+        Returns:
+            user_parameters: Updated parameters (if default values updated) to provide for installation.
 
         Raises:
             ValueError: When a required parameter is missing,
                         or when parameters are passed but not needed for addon.
         """
 
-        def _get_required_cluster_parameters(parameters):
+        def _get_required_cluster_parameters(_addon_parameters):
             """Filter cluster-related ``addon parameters``
 
-            Args: parameters (dict) : Addons parameters from Clusters Management
+            Args:
+                _addon_parameters (dict) : Addons parameters from Clusters Management
             ``cluster_mgmt_v1_addons_addon_id`` API.
 
             Returns:
-                Dict of parameters corresponding to the clusters the current configuration and
-                              required for installation.
+                Dict of required parameters which are relevant for the cluster's configuration
                 example:
                 _required_parameters = {'cidr-range': {'default_value': '10.1.0.0/26'}, 'addon_parameter': {
                         'default_value': ''}, ..}
@@ -289,12 +297,12 @@ class ClusterAddOn(Cluster):
             """
             _required_parameters = {}
 
-            for param in parameters["items"]:
+            for param in _addon_parameters["items"]:
                 if param["required"] is True:
                     param_conditions = [
                         con["data"]
                         for con in param["conditions"]
-                        if con["resource"] == "cluster"
+                        if param["required"] is True and con["resource"] == "cluster"
                     ]
                     if param_conditions:
                         for condition, condition_value in param_conditions[0].items():
@@ -322,7 +330,7 @@ class ClusterAddOn(Cluster):
             raise ValueError(f"{self.addon_name} does not take any parameters")
 
         required_parameters = _get_required_cluster_parameters(
-            parameters=addon_parameters
+            _addon_parameters=addon_parameters
         )
 
         user_addon_parameters = [param["id"] for param in user_parameters]
@@ -375,7 +383,7 @@ class ClusterAddOn(Cluster):
             "addon": addon,
         }
 
-        parameters = self.validate_addon_parameters(
+        parameters = self.validate_and_update_addon_parameters(
             user_parameters=parameters, use_api_defaults=use_api_defaults
         )
 
