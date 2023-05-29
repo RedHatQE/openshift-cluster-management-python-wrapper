@@ -264,12 +264,12 @@ class ClusterAddOn(Cluster):
         ).to_dict()
 
     def validate_and_update_addon_parameters(
-        self, user_parameters, use_api_defaults=True
+        self, user_parameters=[], use_api_defaults=True
     ):
         """Validate and update user input parameters against API's conditions and requirements.
 
         Args:
-            user_parameters (list): User parameters
+            user_parameters (list): User parameters, default is empty list.
                 Example:
                     user_parameters = [{"id": "has-external-resources", "value": "false"},
                                     {"id": "aws-cluster-test-param", "value": "false"},]
