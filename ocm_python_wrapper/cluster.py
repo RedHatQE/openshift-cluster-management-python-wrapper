@@ -269,7 +269,7 @@ class ClusterAddOn(Cluster):
         """Validate and update user input parameters against API's conditions and requirements.
 
         Args:
-            user_parameters (list): User parameters, default is empty list.
+            user_parameters (list): User parameters, default is None.
                 Example:
                     user_parameters = [{"id": "has-external-resources", "value": "false"},
                                     {"id": "aws-cluster-test-param", "value": "false"},]
@@ -320,24 +320,25 @@ class ClusterAddOn(Cluster):
                         }
             return _required_parameters
 
-        if user_parameters is None:
-            user_parameters = []
-
+        _user_parameters = user_parameters or []
         _info = self.addon_info()
         addon_parameters = _info.get("parameters")
+        user_addon_parameters = [param["id"] for param in user_parameters]
+
         if not addon_parameters and user_parameters:
-            raise ValueError(f"{self.addon_name} does not take any parameters")
+            raise ValueError(
+                f"{self.addon_name} does not take any parameters, got {user_addon_parameters}"
+            )
 
         required_parameters = _get_required_cluster_parameters(
             _addon_parameters=addon_parameters
         )
-        user_addon_parameters = [param["id"] for param in user_parameters]
         missing_parameter = []
 
         for param, param_dict in required_parameters.items():
             if param not in user_addon_parameters:
                 if use_api_defaults and param_dict["default_value"]:
-                    user_parameters.append(
+                    _user_parameters.append(
                         {
                             "id": param,
                             "value": param_dict["default_value"],
@@ -350,7 +351,7 @@ class ClusterAddOn(Cluster):
             raise ValueError(
                 f"{self.addon_name} missing some required parameters {missing_parameter}"
             )
-        return user_parameters
+        return _user_parameters
 
     def install_addon(
         self,
