@@ -264,7 +264,7 @@ class ClusterAddOn(Cluster):
         ).to_dict()
 
     def validate_and_update_addon_parameters(
-        self, user_parameters=[], use_api_defaults=True
+        self, user_parameters=None, use_api_defaults=True
     ):
         """Validate and update user input parameters against API's conditions and requirements.
 
@@ -319,6 +319,9 @@ class ClusterAddOn(Cluster):
                             "default_value": param.get("default_value")
                         }
             return _required_parameters
+
+        if user_parameters is None:
+            user_parameters = []
 
         _info = self.addon_info()
         addon_parameters = _info.get("parameters")
