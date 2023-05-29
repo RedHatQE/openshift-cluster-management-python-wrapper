@@ -3,6 +3,7 @@ from importlib.util import find_spec
 
 import rosa.cli as rosa_cli
 import yaml
+from benedict import benedict
 from clouds.aws.roles.roles import create_or_update_role_policy
 from ocm_python_client import ApiException
 from ocm_python_client.exceptions import NotFoundException
@@ -262,26 +263,95 @@ class ClusterAddOn(Cluster):
             self.addon_name
         ).to_dict()
 
-    def validate_addon_parameters(self, parameters):
+    def validate_and_update_addon_parameters(
+        self, user_parameters=None, use_api_defaults=True
+    ):
+        """Validate and update user input parameters against API's conditions and requirements.
+
+        Args:
+            user_parameters (list): User parameters, default is None.
+                Example:
+                    user_parameters = [{"id": "has-external-resources", "value": "false"},
+                                    {"id": "aws-cluster-test-param", "value": "false"},]
+            use_api_defaults (bool): If true, set required parameter (which are not part of `user_parameters`) with
+                                            default value to not fail as missing.
+
+        Returns:
+            list: Updated parameters (if default values updated) to provide for installation.
+
+        Raises:
+            ValueError: When a required parameter is missing,
+                        or when parameters are passed but not needed for addon.
+        """
+
+        def _get_required_cluster_parameters(_addon_parameters):
+            """Filter cluster-related ``addon parameters``
+
+            Args:
+                _addon_parameters (dict) : Addons parameters from Clusters Management
+            cluster_mgmt_v1_addons_addon_id API.
+
+            Returns:
+                Dict of required parameters which are relevant for the cluster's configuration
+                example:
+                _required_parameters = {'cidr-range': {'default_value': '10.1.0.0/26'}, 'addon_parameter': {
+                        'default_value': ''}, ..}
+
+            """
+            _required_parameters = {}
+
+            for param in _addon_parameters["items"]:
+                param_conditions = [
+                    condition["data"]
+                    for condition in param.get("conditions", [])
+                    if param.get("required") and condition["resource"] == "cluster"
+                ]
+                if param_conditions:
+                    for condition, condition_value in param_conditions[0].items():
+                        if not self.check_param_conditions(
+                            clusters_dict=self.instance.to_dict(),
+                            condition=condition,
+                            condition_value=condition_value,
+                        ):
+                            break
+                    else:
+                        _required_parameters[param["id"]] = {
+                            "default_value": param.get("default_value")
+                        }
+            return _required_parameters
+
+        _user_parameters = user_parameters or []
         _info = self.addon_info()
-        _parameters = _info.get("parameters")
-        if not _parameters and parameters:
-            raise ValueError(f"{self.addon_name} does not take any parameters")
+        addon_parameters = _info.get("parameters")
+        user_addon_parameters = [param["id"] for param in user_parameters]
 
-        required_parameters = [
-            param["id"] for param in _parameters["items"] if param["required"] is True
-        ]
-        user_addon_parameters = [param["id"] for param in parameters]
+        if not addon_parameters and user_parameters:
+            raise ValueError(
+                f"{self.addon_name} does not take any parameters, got {user_addon_parameters}"
+            )
 
+        required_parameters = _get_required_cluster_parameters(
+            _addon_parameters=addon_parameters
+        )
         missing_parameter = []
-        for param in required_parameters:
+
+        for param, param_dict in required_parameters.items():
             if param not in user_addon_parameters:
-                missing_parameter.append(param)
+                if use_api_defaults and param_dict["default_value"]:
+                    _user_parameters.append(
+                        {
+                            "id": param,
+                            "value": param_dict["default_value"],
+                        }
+                    )
+                else:
+                    missing_parameter.append(param)
 
         if missing_parameter:
             raise ValueError(
                 f"{self.addon_name} missing some required parameters {missing_parameter}"
             )
+        return _user_parameters
 
     def install_addon(
         self,
@@ -290,6 +360,7 @@ class ClusterAddOn(Cluster):
         wait_timeout=TIMEOUT_30MIN,
         brew_token=None,
         rosa=False,
+        use_api_defaults=True,
     ):
         """
         Install addon on the cluster
@@ -300,6 +371,7 @@ class ClusterAddOn(Cluster):
             wait_timeout (int): Timeout in seconds to wait for addon to be installed.
             brew_token (str): brew token for creating brew pull secret
             rosa (bool): Use ROSA cli if True else use OCM API
+            use_api_defaults (bool): Use addon parameter default value if not provided.
 
          Returns:
             AddOnInstallation or list: list of stdout responses if rosa is True, else AddOnInstallation
@@ -309,21 +381,15 @@ class ClusterAddOn(Cluster):
             "id": self.addon_name,
             "addon": addon,
         }
-        if parameters:
-            _parameters = []
-            self.validate_addon_parameters(parameters=parameters)
-            for params in parameters:
-                _parameters.append(
-                    AddOnInstallationParameter(id=params["id"], value=params["value"])
-                )
 
-            _addon_installation_dict["parameters"] = {"items": _parameters}
+        parameters = self.validate_and_update_addon_parameters(
+            user_parameters=parameters, use_api_defaults=use_api_defaults
+        )
         if (
             self.addon_name == "managed-odh"
             and "stage" in self.client.api_client.configuration.host
         ):
             self.create_rhods_brew_config(brew_token=brew_token)
-
         LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
         if rosa:
             params_command = ""
@@ -333,6 +399,16 @@ class ClusterAddOn(Cluster):
                 command=f"install addon {self.addon_name} --cluster {self.name} {params_command}"
             )
         else:
+            if parameters:
+                _parameters = []
+                for params in parameters:
+                    _parameters.append(
+                        AddOnInstallationParameter(
+                            id=params["id"], value=params["value"]
+                        )
+                    )
+
+                _addon_installation_dict["parameters"] = {"items": _parameters}
             res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
                 cluster_id=self.cluster_id,
                 add_on_installation=AddOnInstallation(
@@ -468,3 +544,25 @@ class ClusterAddOn(Cluster):
             name="pull-secret",  # pragma: allowlist secret
             namespace="openshift-config",
         )
+
+    @staticmethod
+    def check_param_conditions(clusters_dict, condition, condition_value):
+        """
+        Check if parameter conditions met with cluster configuration
+
+        Args:
+            clusters_dict (dict): Cluster instance dict
+            condition (str): Condition key to check
+            condition_value (str): Condition expected value
+
+        Returns:
+            Bool: True if cluster instance match with condition, else False
+
+        """
+        cluster_condition_value = benedict(clusters_dict, keypath_separator=".").get(
+            condition
+        )
+        return (
+            isinstance(condition_value, list)
+            and cluster_condition_value in condition_value
+        ) or cluster_condition_value == condition_value
