@@ -269,15 +269,15 @@ class ClusterAddOn(Cluster):
         """Validate and update user input parameters against API's conditions and requirements.
 
         Args:
-            user_parameters (List): User parameters
+            user_parameters (list): User parameters
                 Example:
-                    parameters = [{"id": "has-external-resources", "value": "false"},
+                    user_parameters = [{"id": "has-external-resources", "value": "false"},
                                     {"id": "aws-cluster-test-param", "value": "false"},]
             use_api_defaults (bool): If true, set required parameter (which are not part of `user_parameters`) with
                                             default value to not fail as missing.
 
         Returns:
-            List: Updated parameters (if default values updated) to provide for installation.
+            list: Updated parameters (if default values updated) to provide for installation.
 
         Raises:
             ValueError: When a required parameter is missing,
@@ -289,7 +289,7 @@ class ClusterAddOn(Cluster):
 
             Args:
                 _addon_parameters (dict) : Addons parameters from Clusters Management
-            ``cluster_mgmt_v1_addons_addon_id`` API.
+            cluster_mgmt_v1_addons_addon_id API.
 
             Returns:
                 Dict of required parameters which are relevant for the cluster's configuration
