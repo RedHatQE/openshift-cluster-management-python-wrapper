@@ -457,19 +457,14 @@ class ClusterAddOn(Cluster):
             LOGGER.info(f"{self.addon_name} not found")
             return
 
-    def addon_installation_instance_sampler(self, wait_timeout=TIMEOUT_30MIN):
-        return TimeoutSampler(
-            wait_timeout=wait_timeout,
-            sleep=SLEEP_1SEC,
-            func=self.addon_installation_instance,
-        )
-
     def wait_for_install_state(self, state, wait_timeout=TIMEOUT_30MIN):
         _state = None
         try:
             for (
                 _addon_installation_instance
-            ) in self.addon_installation_instance_sampler(wait_timeout=wait_timeout):
+            ) in self.addon_installation_instance_sampler(
+                func=self.addon_installation_instance, wait_timeout=wait_timeout
+            ):
                 _state = str(_addon_installation_instance.get("state"))
                 if _state == state:
                     return True
@@ -504,7 +499,9 @@ class ClusterAddOn(Cluster):
         if wait:
             for (
                 _addon_installation_instance
-            ) in self.addon_installation_instance_sampler(wait_timeout=wait_timeout):
+            ) in self.addon_installation_instance_sampler(
+                func=self.addon_installation_instance, wait_timeout=wait_timeout
+            ):
                 if not _addon_installation_instance:
                     return True
         LOGGER.info(f"{self.addon_name} v{self.addon_version} was successfully removed")
@@ -574,3 +571,11 @@ class ClusterAddOn(Cluster):
             isinstance(condition_value, list)
             and cluster_condition_value in condition_value
         ) or cluster_condition_value == condition_value
+
+    @staticmethod
+    def addon_installation_instance_sampler(func, wait_timeout=TIMEOUT_30MIN):
+        return TimeoutSampler(
+            wait_timeout=wait_timeout,
+            sleep=SLEEP_1SEC,
+            func=func,
+        )
