@@ -1,6 +1,7 @@
 import os
 from importlib.util import find_spec
 
+import ipdb
 import rosa.cli as rosa_cli
 import yaml
 from benedict import benedict
@@ -579,3 +580,22 @@ class ClusterAddOn(Cluster):
             sleep=SLEEP_1SEC,
             func=func,
         )
+
+
+def wait_for_rosa_installation(command, wait_timeout=TIMEOUT_30MIN):
+    ipdb.set_trace()
+    for rosa_sampler in TimeoutSampler(
+        wait_timeout=wait_timeout,
+        sleep=SLEEP_1SEC,
+        func=lambda: rosa_cli.execute(command=command),
+    ):
+        ipdb.set_trace()
+        if rosa_sampler:
+            return True
+        ipdb.set_trace()
+    # except TimeoutExpiredError:
+    #     LOGGER.error(
+    #         f"Timeout waiting for {self.addon_name} state to execute {command}"
+    #     )
+    #     raise
+    return False
