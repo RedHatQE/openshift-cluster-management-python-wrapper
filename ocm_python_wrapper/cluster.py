@@ -395,8 +395,10 @@ class ClusterAddOn(Cluster):
             params_command = ""
             for parameter in parameters:
                 params_command += f" --{parameter['id']} {parameter['value']}"
+            # TODO remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
             res = rosa_cli.execute(
                 command=f"install addon {self.addon_name} --cluster {self.name} {params_command}"
+                f" --billing-model standard"
             )
         else:
             if parameters:
