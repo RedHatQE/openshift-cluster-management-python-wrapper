@@ -1,7 +1,6 @@
 import os
 from importlib.util import find_spec
 
-import ipdb
 import rosa.cli as rosa_cli
 import yaml
 from benedict import benedict
@@ -25,6 +24,7 @@ from simple_logger.logger import get_logger
 from ocm_python_wrapper.exceptions import MissingResourceError
 
 LOGGER = get_logger(__name__)
+TIMEOUT_5MIN = 5 * 60
 TIMEOUT_10MIN = 10 * 60
 TIMEOUT_30MIN = 30 * 60
 SLEEP_1SEC = 1
@@ -378,6 +378,20 @@ class ClusterAddOn(Cluster):
          Returns:
             AddOnInstallation or list: list of stdout responses if rosa is True, else AddOnInstallation
         """
+
+        def _wait_for_rhoam_installation(_command):
+            try:
+                for rosa_sampler in TimeoutSampler(
+                    wait_timeout=TIMEOUT_5MIN,
+                    sleep=SLEEP_1SEC,
+                    func=rosa_cli.execute,
+                    command=_command,
+                ):
+                    return rosa_sampler
+            except TimeoutExpiredError:
+                LOGGER.error(f"Timeout waiting to execute {_command}")
+                raise
+
         addon = AddOn(id=self.addon_name)
         _addon_installation_dict = {
             "id": self.addon_name,
@@ -397,12 +411,15 @@ class ClusterAddOn(Cluster):
             params_command = ""
             for parameter in parameters:
                 params_command += f" --{parameter['id']} {parameter['value']}"
-            # TODO remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
-            res = rosa_cli.execute(
-                command=f"install addon {self.addon_name} --cluster {self.name} {params_command}"
-                f" --billing-model standard"
-            )
-            ipdb.set_trace()
+
+            # TODO: remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
+            command = f"install addon {self.addon_name} --cluster {self.name} {params_command} --billing-model standard"
+
+            if self.addon_name == "managed-api-service":
+                # TODO: remove _wait_for_rhoam_installation after https://github.com/openshift/rosa/issues/970 resolved
+                res = _wait_for_rhoam_installation(_command=command)
+            else:
+                res = rosa_cli.execute(command=command)
         else:
             if parameters:
                 _parameters = []
@@ -581,19 +598,3 @@ class ClusterAddOn(Cluster):
             sleep=SLEEP_1SEC,
             func=func,
         )
-
-
-def wait_for_rosa_installation(command, wait_timeout=TIMEOUT_30MIN):
-    try:
-        for rosa_sampler in TimeoutSampler(
-            wait_timeout=wait_timeout,
-            sleep=SLEEP_1SEC,
-            func=lambda: rosa_cli.execute(command=command),
-        ):
-            ipdb.set_trace()
-            print(rosa_sampler)
-            if "Failed to add operator role to cluster" not in rosa_sampler:
-                return rosa_sampler
-    except TimeoutExpiredError:
-        LOGGER.error(f"Timeout waiting to execute {command}")
-        raise
