@@ -14,6 +14,7 @@ from ocm_python_client.model.add_on_installation_parameter import (
 )
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
 from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
+from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
@@ -531,8 +532,13 @@ class ClusterAddOn(Cluster):
 
     @staticmethod
     def create_rhods_brew_config(brew_token):
+        icsp_name = "ocp-mgmt-wrapper-brew-registry"
+        icsp = ImageContentSourcePolicy(name=icsp_name)
+        if icsp.exists:
+            icsp.clean_up()
+
         create_icsp(
-            icsp_name="brew-registry",
+            icsp_name=icsp_name,
             repository_digest_mirrors=[
                 {
                     "source": "registry.redhat.io/rhods",
