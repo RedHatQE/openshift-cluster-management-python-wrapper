@@ -402,6 +402,7 @@ class ClusterAddOn(Cluster):
                 command=f"install addon {self.addon_name} --cluster {self.name} {params_command}"
                 f" --billing-model standard"
             )
+            ipdb.set_trace()
         else:
             if parameters:
                 _parameters = []
@@ -583,19 +584,16 @@ class ClusterAddOn(Cluster):
 
 
 def wait_for_rosa_installation(command, wait_timeout=TIMEOUT_30MIN):
-    ipdb.set_trace()
-    for rosa_sampler in TimeoutSampler(
-        wait_timeout=wait_timeout,
-        sleep=SLEEP_1SEC,
-        func=lambda: rosa_cli.execute(command=command),
-    ):
-        ipdb.set_trace()
-        if rosa_sampler:
-            return True
-        ipdb.set_trace()
-    # except TimeoutExpiredError:
-    #     LOGGER.error(
-    #         f"Timeout waiting for {self.addon_name} state to execute {command}"
-    #     )
-    #     raise
-    return False
+    try:
+        for rosa_sampler in TimeoutSampler(
+            wait_timeout=wait_timeout,
+            sleep=SLEEP_1SEC,
+            func=lambda: rosa_cli.execute(command=command),
+        ):
+            ipdb.set_trace()
+            print(rosa_sampler)
+            if "Failed to add operator role to cluster" not in rosa_sampler:
+                return rosa_sampler
+    except TimeoutExpiredError:
+        LOGGER.error(f"Timeout waiting to execute {command}")
+        raise
