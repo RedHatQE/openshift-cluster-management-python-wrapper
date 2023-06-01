@@ -301,7 +301,7 @@ class ClusterAddOn(Cluster):
             """
             _required_parameters = {}
 
-            for param in _addon_parameters["items"]:
+            for param in _addon_parameters.get("items", []):
                 param_conditions = [
                     condition["data"]
                     for condition in param.get("conditions", [])
