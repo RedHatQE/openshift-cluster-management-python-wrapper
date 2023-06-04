@@ -323,7 +323,7 @@ class ClusterAddOn(Cluster):
 
         _user_parameters = user_parameters or []
         _info = self.addon_info()
-        addon_parameters = _info.get("parameters")
+        addon_parameters = _info.get("parameters", {})
         user_addon_parameters = [param["id"] for param in user_parameters]
 
         if not addon_parameters and user_parameters:
