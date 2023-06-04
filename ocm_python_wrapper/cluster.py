@@ -380,17 +380,13 @@ class ClusterAddOn(Cluster):
         """
 
         def _wait_for_rhoam_installation(_command):
-            try:
-                for rosa_sampler in TimeoutSampler(
-                    wait_timeout=TIMEOUT_5MIN,
-                    sleep=SLEEP_1SEC,
-                    func=rosa_cli.execute,
-                    command=_command,
-                ):
-                    return rosa_sampler
-            except TimeoutExpiredError:
-                LOGGER.error(f"Timeout waiting to execute {_command}")
-                raise
+            for rosa_sampler in TimeoutSampler(
+                wait_timeout=TIMEOUT_5MIN,
+                sleep=SLEEP_1SEC,
+                func=rosa_cli.execute,
+                command=_command,
+            ):
+                return rosa_sampler
 
         addon = AddOn(id=self.addon_name)
         _addon_installation_dict = {
