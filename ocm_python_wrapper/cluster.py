@@ -380,11 +380,8 @@ class ClusterAddOn(Cluster):
         """
 
         def _wait_for_rhoam_installation(_command):
-            for rosa_sampler in TimeoutSampler(
-                wait_timeout=TIMEOUT_5MIN,
-                sleep=SLEEP_1SEC,
-                func=rosa_cli.execute,
-                command=_command,
+            for rosa_sampler in self.addon_installation_instance_sampler(
+                func=rosa_cli.execute, wait_timeout=TIMEOUT_5MIN, command=_command
             ):
                 return rosa_sampler
 
@@ -588,9 +585,7 @@ class ClusterAddOn(Cluster):
         ) or cluster_condition_value == condition_value
 
     @staticmethod
-    def addon_installation_instance_sampler(func, wait_timeout=TIMEOUT_30MIN):
+    def addon_installation_instance_sampler(func, wait_timeout=TIMEOUT_30MIN, **kwargs):
         return TimeoutSampler(
-            wait_timeout=wait_timeout,
-            sleep=SLEEP_1SEC,
-            func=func,
+            wait_timeout=wait_timeout, sleep=SLEEP_1SEC, func=func, **kwargs
         )
