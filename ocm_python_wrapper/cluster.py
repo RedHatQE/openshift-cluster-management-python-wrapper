@@ -24,6 +24,7 @@ from simple_logger.logger import get_logger
 from ocm_python_wrapper.exceptions import MissingResourceError
 
 LOGGER = get_logger(__name__)
+TIMEOUT_5MIN = 5 * 60
 TIMEOUT_10MIN = 10 * 60
 TIMEOUT_30MIN = 30 * 60
 SLEEP_1SEC = 1
@@ -377,6 +378,13 @@ class ClusterAddOn(Cluster):
          Returns:
             AddOnInstallation or list: list of stdout responses if rosa is True, else AddOnInstallation
         """
+
+        def _wait_for_rhoam_installation(_command):
+            for rosa_sampler in self.addon_installation_instance_sampler(
+                func=rosa_cli.execute, wait_timeout=TIMEOUT_5MIN, command=_command
+            ):
+                return rosa_sampler
+
         addon = AddOn(id=self.addon_name)
         _addon_installation_dict = {
             "id": self.addon_name,
@@ -396,11 +404,15 @@ class ClusterAddOn(Cluster):
             params_command = ""
             for parameter in parameters:
                 params_command += f" --{parameter['id']} {parameter['value']}"
-            # TODO remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
-            res = rosa_cli.execute(
-                command=f"install addon {self.addon_name} --cluster {self.name} {params_command}"
-                f" --billing-model standard"
-            )
+
+            # TODO: remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
+            command = f"install addon {self.addon_name} --cluster {self.name} {params_command} --billing-model standard"
+
+            if self.addon_name == "managed-api-service":
+                # TODO: remove _wait_for_rhoam_installation after https://github.com/openshift/rosa/issues/970 resolved
+                res = _wait_for_rhoam_installation(_command=command)
+            else:
+                res = rosa_cli.execute(command=command)
         else:
             if parameters:
                 _parameters = []
@@ -457,19 +469,14 @@ class ClusterAddOn(Cluster):
             LOGGER.info(f"{self.addon_name} not found")
             return
 
-    def addon_installation_instance_sampler(self, wait_timeout=TIMEOUT_30MIN):
-        return TimeoutSampler(
-            wait_timeout=wait_timeout,
-            sleep=SLEEP_1SEC,
-            func=self.addon_installation_instance,
-        )
-
     def wait_for_install_state(self, state, wait_timeout=TIMEOUT_30MIN):
         _state = None
         try:
             for (
                 _addon_installation_instance
-            ) in self.addon_installation_instance_sampler(wait_timeout=wait_timeout):
+            ) in self.addon_installation_instance_sampler(
+                func=self.addon_installation_instance, wait_timeout=wait_timeout
+            ):
                 _state = str(_addon_installation_instance.get("state"))
                 if _state == state:
                     return True
@@ -504,7 +511,9 @@ class ClusterAddOn(Cluster):
         if wait:
             for (
                 _addon_installation_instance
-            ) in self.addon_installation_instance_sampler(wait_timeout=wait_timeout):
+            ) in self.addon_installation_instance_sampler(
+                func=self.addon_installation_instance, wait_timeout=wait_timeout
+            ):
                 if not _addon_installation_instance:
                     return True
         LOGGER.info(f"{self.addon_name} v{self.addon_version} was successfully removed")
@@ -574,3 +583,9 @@ class ClusterAddOn(Cluster):
             isinstance(condition_value, list)
             and cluster_condition_value in condition_value
         ) or cluster_condition_value == condition_value
+
+    @staticmethod
+    def addon_installation_instance_sampler(func, wait_timeout=TIMEOUT_30MIN, **kwargs):
+        return TimeoutSampler(
+            wait_timeout=wait_timeout, sleep=SLEEP_1SEC, func=func, **kwargs
+        )
