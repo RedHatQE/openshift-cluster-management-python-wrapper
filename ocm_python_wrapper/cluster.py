@@ -268,22 +268,24 @@ class ClusterAddOn(Cluster):
     def validate_and_update_addon_parameters(
         self, user_parameters=None, use_api_defaults=True
     ):
-        """Validate and update user input parameters against API's conditions and requirements.
+        """
+        Validate and update user input parameters against API's conditions and requirements.
 
         Args:
             user_parameters (list): User parameters, default is None.
-                Example:
-                    user_parameters = [{"id": "has-external-resources", "value": "false"},
-                                    {"id": "aws-cluster-test-param", "value": "false"},]
+                example: user_parameters = [
+                    {"id": "has-external-resources", "value": "false"},
+                    {"id": "aws-cluster-test-param", "value": "false"}
+                ]
             use_api_defaults (bool): If true, set required parameter (which are not part of `user_parameters`) with
-                                            default value to not fail as missing.
+                default value to not fail as missing.
 
         Returns:
             list: Updated parameters (if default values updated) to provide for installation.
 
         Raises:
             ValueError: When a required parameter is missing,
-                        or when parameters are passed but not needed for addon.
+                or when parameters are passed but not needed for addon.
         """
 
         def _get_required_cluster_parameters(_addon_parameters):
@@ -291,43 +293,56 @@ class ClusterAddOn(Cluster):
 
             Args:
                 _addon_parameters (dict) : Addons parameters from Clusters Management
-            cluster_mgmt_v1_addons_addon_id API.
+                    cluster_mgmt_v1_addons_addon_id API.
 
             Returns:
                 Dict of required parameters which are relevant for the cluster's configuration
-                example:
-                _required_parameters = {'cidr-range': {'default_value': '10.1.0.0/26'}, 'addon_parameter': {
-                        'default_value': ''}, ..}
 
+            Example:
+                _required_parameters = {
+                    'cidr-range': {'default_value': '10.1.0.0/26'},
+                    'addon_parameter': {'default_value': ''}, ..
+                }
             """
             _required_parameters = {}
 
             for param in _addon_parameters.get("items", []):
-                param_conditions = [
-                    condition["data"]
-                    for condition in param.get("conditions", [])
-                    if param.get("required") and condition["resource"] == "cluster"
-                ]
-                if param_conditions:
-                    for condition, condition_value in param_conditions[0].items():
-                        if not self.check_param_conditions(
-                            clusters_dict=self.instance.to_dict(),
-                            condition=condition,
-                            condition_value=condition_value,
-                        ):
-                            break
+                conditions = param.get("conditions")
+                if param.get("required"):
+                    param_id = param["id"]
+                    default_value = param.get("default_value")
+                    if conditions:
+                        param_conditions = [
+                            condition["data"]
+                            for condition in conditions
+                            if condition["resource"] == "cluster"
+                        ]
+                        if param_conditions:
+                            for condition, condition_value in param_conditions[
+                                0
+                            ].items():
+                                if not self.check_param_conditions(
+                                    clusters_dict=self.instance.to_dict(),
+                                    condition=condition,
+                                    condition_value=condition_value,
+                                ):
+                                    break
+                            else:
+                                _required_parameters[param_id] = {
+                                    "default_value": default_value
+                                }
                     else:
-                        _required_parameters[param["id"]] = {
-                            "default_value": param.get("default_value")
+                        _required_parameters[param_id] = {
+                            "default_value": default_value
                         }
             return _required_parameters
 
         _user_parameters = user_parameters or []
         _info = self.addon_info()
         addon_parameters = _info.get("parameters", {})
-        user_addon_parameters = [param["id"] for param in user_parameters]
+        user_addon_parameters = [param["id"] for param in _user_parameters]
 
-        if not addon_parameters and user_parameters:
+        if not addon_parameters and _user_parameters:
             raise ValueError(
                 f"{self.addon_name} does not take any parameters, got {user_addon_parameters}"
             )
@@ -368,7 +383,7 @@ class ClusterAddOn(Cluster):
         Install addon on the cluster
 
         Args:
-            parameters (list): List of dict.
+            parameters (list): List of dicts.
             wait (bool): True to wait for addon to be installed.
             wait_timeout (int): Timeout in seconds to wait for addon to be installed.
             brew_token (str): brew token for creating brew pull secret
