@@ -24,7 +24,7 @@ from simple_logger.logger import get_logger
 from ocm_python_wrapper.exceptions import MissingResourceError
 
 LOGGER = get_logger(__name__)
-TIMEOUT_5MIN = 5 * 60
+TIMEOUT_15MIN = 15 * 60
 TIMEOUT_10MIN = 10 * 60
 TIMEOUT_30MIN = 30 * 60
 SLEEP_1SEC = 1
@@ -396,7 +396,7 @@ class ClusterAddOn(Cluster):
 
         def _wait_for_rhoam_installation(_command):
             for rosa_sampler in self.addon_installation_instance_sampler(
-                func=rosa_cli.execute, wait_timeout=TIMEOUT_5MIN, command=_command
+                func=rosa_cli.execute, wait_timeout=TIMEOUT_15MIN, command=_command
             ):
                 return rosa_sampler
 
