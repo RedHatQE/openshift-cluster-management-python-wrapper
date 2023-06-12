@@ -398,6 +398,9 @@ class ClusterAddOn(Cluster):
             for rosa_sampler in self.addon_installation_instance_sampler(
                 func=rosa_cli.execute, wait_timeout=TIMEOUT_15MIN, command=_command
             ):
+                LOGGER.info(
+                    f"{rosa_sampler['out'].split_lines()}\n{rosa_sampler['err'].split_lines()}"
+                )
                 return rosa_sampler
 
         addon = AddOn(id=self.addon_name)
