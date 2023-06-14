@@ -46,6 +46,8 @@ class Cluster:
         self.name = name
         self.cluster_id = self._cluster_id()
         self.hypershift = self.is_hypershift
+        self.rosa = self._is_rosa
+        self.region = self._region
 
     def _cluster_id(self):
         cluster_list = self.client.api_clusters_mgmt_v1_clusters_get(
@@ -227,6 +229,17 @@ class Cluster:
     def cloud_provider(self):
         return self.instance.cloud_provider.id if self.exists else None
 
+    @property
+    def _is_rosa(self):
+        return (
+            self.instance.get("aws", {}).get("tags", {}).get("red-hat-clustertype")
+            == "rosa"
+        )
+
+    @property
+    def _region(self):
+        return self.instance.get("region", {}).get("id")
+
 
 class ClusterAddOn(Cluster):
     """
@@ -396,7 +409,11 @@ class ClusterAddOn(Cluster):
 
         def _wait_for_rhoam_installation(_command):
             for rosa_sampler in self.addon_installation_instance_sampler(
-                func=rosa_cli.execute, wait_timeout=TIMEOUT_5MIN, command=_command
+                func=rosa_cli.execute,
+                wait_timeout=TIMEOUT_5MIN,
+                command=_command,
+                ocm_client=self.client,
+                aws_region=self.region,
             ):
                 return rosa_sampler
 
@@ -427,7 +444,9 @@ class ClusterAddOn(Cluster):
                 # TODO: remove _wait_for_rhoam_installation after https://github.com/openshift/rosa/issues/970 resolved
                 res = _wait_for_rhoam_installation(_command=command)
             else:
-                res = rosa_cli.execute(command=command)
+                res = rosa_cli.execute(
+                    command=command, ocm_client=self.client, aws_region=self.region
+                )
         else:
             if parameters:
                 _parameters = []
@@ -516,7 +535,9 @@ class ClusterAddOn(Cluster):
         LOGGER.info(f"Removing addon {self.addon_name} v{self.addon_version}")
         if rosa:
             res = rosa_cli.execute(
-                command=f"uninstall addon {self.addon_name} --cluster {self.name}"
+                command=f"uninstall addon {self.addon_name} --cluster {self.name}",
+                ocm_client=self.client,
+                aws_region=self.region,
             )
         else:
             res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_addoninstallation_id_delete(
