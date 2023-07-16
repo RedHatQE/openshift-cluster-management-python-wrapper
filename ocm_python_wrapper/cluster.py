@@ -240,6 +240,10 @@ class Cluster:
     def _region(self):
         return self.instance.get("region", {}).get("id")
 
+    @property
+    def kubeadmin_password(self):
+        return self.credentials.admin.password
+
 
 class ClusterAddOn(Cluster):
     """
