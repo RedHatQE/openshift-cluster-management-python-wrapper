@@ -580,7 +580,7 @@ class ClusterAddOn(Cluster):
         ).update()
 
     @staticmethod
-    def create_rhods_brew_config(brew_token):
+    def create_rhods_brew_config(brew_token=None):
         icsp_name = "ocp-mgmt-wrapper-brew-registry"
         icsp = ImageContentSourcePolicy(name=icsp_name)
         if icsp.exists:
@@ -595,7 +595,10 @@ class ClusterAddOn(Cluster):
                 }
             ],
         )
-        secret_data_dict = {"auths": {"brew.registry.redhat.io": {"auth": brew_token}}}
+
+        secret_data_dict = {"auths": {"brew.registry.redhat.io": {}}}
+        if brew_token:
+            secret_data_dict["auths"]["brew.registry.redhat.io"]["auth"] = brew_token
         create_update_secret(
             secret_data_dict=secret_data_dict,
             name="pull-secret",  # pragma: allowlist secret
