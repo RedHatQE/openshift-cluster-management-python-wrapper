@@ -595,7 +595,8 @@ class ClusterAddOn(Cluster):
                 }
             ],
         )
-        secret_data_dict = {"auths": {"brew.registry.redhat.io": {"auth": brew_token}}}
+        # secret_data_dict = {"auths": {"brew.registry.redhat.io": {"auth": brew_token}}}
+        secret_data_dict = {"auths": {"brew.registry.redhat.io": {}}}
         create_update_secret(
             secret_data_dict=secret_data_dict,
             name="pull-secret",  # pragma: allowlist secret
