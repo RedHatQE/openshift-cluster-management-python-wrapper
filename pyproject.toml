@@ -16,57 +16,45 @@ exclude = '''
 line_length = 88
 profile = "black"
 
-
 [build-system]
-requires = ["setuptools>=61.2"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
 
-[project]
+[tool.poetry]
 name = "openshift-cluster-management-python-wrapper"
-authors = [
-    {name = "Meni Yakove", email = "myakove@gmail.com"},
-    {name = "Ruth Netser", email = "rnetser@gmail.com"}
-]
 description = "Wrapper around https://github.com/openshift/openshift-cluster-management-python-client"
+version = "0.0.0"
+authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
+readme = "README.md"
+homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper"
+keywords = ["Openshift", "OCM"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.8"
-keywords = ["Openshift", "OCM"]
-dependencies = [
-    "colorlog",
-    "openshift-cluster-management-python-client",
-    "openshift-python-wrapper",
-    "requests",
-    "pyyaml",
-    "openshift-python-utilities",
-    "rosa-python-client",
-    "python-simple-logger",
-    "redhat-qe-cloud-tools",
-    "importlib",
-    "python-benedict",
-]
-dynamic = ["version"]
+packages = [{include = "ocm_python_wrapper"}]
+# Include ocm-python-wrapper package data:
+include = [{path = "manifests/*.json"}]
 
-[tool.setuptools.dynamic]
-version = {file = "VERSION"}
+[tool.poetry.dependencies]
+python = "^3.8"
+colorlog = "^6.7.0"
+python-benedict = "^0.32.0"
+python-simple-logger = "^1.0.5"
+rosa-python-client = "^1.0.28"
+openshift-cluster-management-python-client = "^1.0.23"
+openshift-python-wrapper = "^4.14.4"
+requests = "^2.31.0"
+pyyaml = "^6.0.1"
+openshift-python-utilities = "^4.14.2"
+importlib = "^1.0.4"
+redhat-qe-cloud-tools = "^1.0.10"
 
-[project.readme]
-file = "README.md"
-content-type = "text/markdown"
+[tool.poetry-dynamic-versioning.substitution]
+files = ["VERSION"]
 
-[project.urls]
+[tool.poetry.urls]
 Homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper"
 Download = "https://pypi.org/project/openshift-cluster-management-python-wrapper/"
 "Bug Tracker" = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/issues"
 Documentation = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/blob/main/README.md"
-
-[tool.setuptools]
-include-package-data = true
-
-[tool.setuptools.packages.find]
-include = ["ocm_python_wrapper"]
-
-[tool.setuptools.package-data]
-ocm_python_wrapper = ["manifests/*.json"]
