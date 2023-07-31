@@ -26,7 +26,9 @@ description = "Wrapper around https://github.com/openshift/openshift-cluster-man
 version = "0.0.0"
 authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
 readme = "README.md"
+license = "Apache-2.0"
 homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper"
+documentation = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/blob/main/README.md"
 keywords = ["Openshift", "OCM"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -50,11 +52,17 @@ openshift-python-utilities = "^4.14.2"
 importlib = "^1.0.4"
 redhat-qe-cloud-tools = "^1.0.10"
 
+[tool.poetry.group.dev.dependencies]
+ipdb = "^0.13.13"
+ipython = "*"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+pattern = "((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)"
+
 [tool.poetry-dynamic-versioning.substitution]
 files = ["VERSION"]
 
 [tool.poetry.urls]
-Homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper"
 Download = "https://pypi.org/project/openshift-cluster-management-python-wrapper/"
 "Bug Tracker" = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/issues"
-Documentation = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/blob/main/README.md"
