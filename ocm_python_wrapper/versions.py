@@ -6,6 +6,17 @@ class Versions:
         self.client = client
 
     def get(self, version_prefix=None, channel_group=None, size=10000):
+        """
+        Retrieves a dictionary of available versions grouped by channel group.
+
+        Args:
+            version_prefix (str, optional): Prefix of the version to be searched. Defaults to None.
+            channel_group (str, optional): Channel group to be searched. Defaults to None.
+            size (int, optional): Size of the versions list to be retrieved. Defaults to 10000.
+
+        Returns:
+            defaultdict: A dictionary with channel group as keys and list of versions as values.
+        """
         version_kwargs = {"order": "id desc", "size": size}
         version_search_str = "enabled = 't'"
         if channel_group:
