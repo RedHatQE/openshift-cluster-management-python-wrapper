@@ -1,3 +1,4 @@
+import inspect
 import os
 from importlib.util import find_spec
 
@@ -41,7 +42,11 @@ class Clusters:
 
 
 class Cluster:
-    def __init__(self, client, name):
+    def __init__(
+        self,
+        client,
+        name,
+    ):
         self.client = client
         self.name = name
         self.cluster_id = self._cluster_id()
@@ -98,8 +103,8 @@ class Cluster:
                     return
         except TimeoutExpiredError:
             LOGGER.error(
-                f"Cluster {self.name} version {self.instance.version.raw_id} does not match "
-                f"expected {ocp_target_version} version"
+                f"Cluster {self.name} version {self.instance.version.raw_id} does not"
+                f" match expected {ocp_target_version} version"
             )
             raise
 
@@ -159,7 +164,8 @@ class Cluster:
         self, ocp_target_version, wait_timeout=TIMEOUT_10MIN
     ):
         LOGGER.info(
-            f"Wait for cluster {self.name} upgrade policy to be updated with {ocp_target_version} version."
+            f"Wait for cluster {self.name} upgrade policy to be updated with"
+            f" {ocp_target_version} version."
         )
         samples = TimeoutSampler(
             wait_timeout=wait_timeout,
@@ -179,10 +185,10 @@ class Cluster:
     def is_hypershift(self):
         return self.instance.hypershift.enabled is True
 
-    def delete(self, wait=True, timeout=1800):
+    def delete(self, wait=True, timeout=1800, deprovision=True):
         LOGGER.info(f"Delete cluster {self.name}.")
         self.client.api_clusters_mgmt_v1_clusters_cluster_id_delete(
-            cluster_id=self.cluster_id
+            cluster_id=self.cluster_id, deprovision=deprovision
         )
         if wait:
             self.wait_for_cluster_deletion(wait_timeout=timeout)
@@ -243,6 +249,123 @@ class Cluster:
     @property
     def kubeadmin_password(self):
         return self.credentials.admin.password
+
+    @classmethod
+    def osd_aws_dict(
+        cls,
+        name,
+        region,
+        ocp_version,
+        access_key_id,
+        account_id,
+        secret_access_key,
+        replicas=2,
+        compute_machine_type="m5.4xlarge",
+        multi_az=False,
+        channel_group="stable",
+        expiration_time=None,
+    ):
+        _cluster_dict = {
+            "name": name,
+            "region": {"id": region},
+            "nodes": {
+                "compute_machine_type": {"id": compute_machine_type},
+                "compute": replicas,
+            },
+            "managed": True,
+            "product": {"id": "osd"},
+            "cloud_provider": {"id": "aws"},
+            "multi_az": multi_az,
+            "etcd_encryption": True,
+            "disable_user_workload_monitoring": True,
+            "version": {
+                "id": f"openshift-v{ocp_version}",
+                "channel_group": channel_group,
+            },
+            "properties": {"use_local_credentials": "true"},
+            "ccs": {"enabled": True, "disable_scp_checks": False},
+            "aws": {
+                "access_key_id": access_key_id,
+                "account_id": account_id,
+                "secret_access_key": secret_access_key,
+            },
+        }
+
+        if expiration_time:
+            _cluster_dict["expiration_time"] = expiration_time
+
+        return _cluster_dict
+
+    @classmethod
+    def provision_osd_aws(
+        cls,
+        client,
+        name=None,
+        region=None,
+        ocp_version=None,
+        access_key_id=None,
+        account_id=None,
+        secret_access_key=None,
+        replicas=2,
+        compute_machine_type="m5.4xlarge",
+        multi_az=False,
+        channel_group="stable",
+        expiration_time=None,
+        cluster_dict=None,
+        wait_for_ready=False,
+        wait_timeout=TIMEOUT_30MIN,
+    ):
+        if cluster_dict:
+            _cluster_dict = cluster_dict
+        else:
+            frame = inspect.currentframe()
+            frame_values = inspect.getargvalues(frame)[3]
+            missing_attributes = [
+                attr_name
+                for attr_name in [
+                    "name",
+                    "region",
+                    "ocp_version",
+                    "access_key_id",
+                    "account_id",
+                    "secret_access_key",
+                ]
+                if not frame_values.get(attr_name)
+            ]
+
+            if missing_attributes:
+                raise ValueError(f"Missing attributes: {missing_attributes}")
+
+            _cluster_dict = cls.osd_aws_dict(
+                name=name,
+                region=region,
+                ocp_version=ocp_version,
+                access_key_id=access_key_id,
+                account_id=account_id,
+                secret_access_key=secret_access_key,
+                replicas=replicas,
+                compute_machine_type=compute_machine_type,
+                multi_az=multi_az,
+                channel_group=channel_group,
+                expiration_time=expiration_time,
+            )
+
+        client.api_clusters_mgmt_v1_clusters_post(cluster=_cluster_dict)
+        cluster_object = None
+        for cluster_object in TimeoutSampler(
+            wait_timeout=TIMEOUT_30MIN,
+            sleep=SLEEP_1SEC,
+            func=cls,
+            client=client,
+            name=name,
+        ):
+            if cluster_object:
+                break
+
+        if wait_for_ready:
+            cluster_object.wait_for_cluster_ready(wait_timeout=wait_timeout)
+
+        return cluster_object
 
 
 class ClusterAddOn(Cluster):
@@ -361,7 +484,8 @@ class ClusterAddOn(Cluster):
 
         if not addon_parameters and _user_parameters:
             raise ValueError(
-                f"{self.addon_name} does not take any parameters, got {user_addon_parameters}"
+                f"{self.addon_name} does not take any parameters, got"
+                f" {user_addon_parameters}"
             )
 
         required_parameters = _get_required_cluster_parameters(
@@ -383,7 +507,8 @@ class ClusterAddOn(Cluster):
 
         if missing_parameter:
             raise ValueError(
-                f"{self.addon_name} missing some required parameters {missing_parameter}"
+                f"{self.addon_name} missing some required parameters"
+                f" {missing_parameter}"
             )
         return _user_parameters
 
@@ -442,7 +567,10 @@ class ClusterAddOn(Cluster):
                 params_command += f" --{parameter['id']} {parameter['value']}"
 
             # TODO: remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
-            command = f"install addon {self.addon_name} --cluster {self.name} {params_command} --billing-model standard"
+            command = (
+                f"install addon {self.addon_name} --cluster"
+                f" {self.name} {params_command} --billing-model standard"
+            )
 
             if self.addon_name == "managed-api-service":
                 # TODO: remove _wait_for_rhoam_installation after https://github.com/openshift/rosa/issues/970 resolved
@@ -520,7 +648,8 @@ class ClusterAddOn(Cluster):
                     return True
         except TimeoutExpiredError:
             LOGGER.error(
-                f"Timeout waiting for {self.addon_name} state to be {state}, last state was {_state}"
+                f"Timeout waiting for {self.addon_name} state to be {state}, last state"
+                f" was {_state}"
             )
             raise
 

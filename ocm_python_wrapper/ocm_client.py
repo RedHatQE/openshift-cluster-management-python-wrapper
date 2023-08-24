@@ -47,11 +47,9 @@ class OCMPythonClient(ApiClient):
                     response.json().get("error_description")
                     == "Offline user session not found"
                 ):
-                    raise AuthenticationError(
-                        f"""OFFLINE Token Expired!
+                    raise AuthenticationError(f"""OFFLINE Token Expired!
                         Please update your config with a new token from: https://cloud.redhat.com/openshift/token\n"
-                        Error Code: {response.status_code}"""
-                    )
+                        Error Code: {response.status_code}""")
             else:
                 raise EndpointAccessError(
                     err=response.status_code, endpoint=self.endpoint
