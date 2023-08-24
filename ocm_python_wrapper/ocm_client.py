@@ -13,6 +13,10 @@ LOGGER = get_logger(__name__)
 
 
 class OCMPythonClient(ApiClient):
+    """
+    A client for interacting with the OpenShift Cluster Manager (OCM).
+    """
+
     def __init__(
         self,
         token,
@@ -20,6 +24,15 @@ class OCMPythonClient(ApiClient):
         api_host="production",
         discard_unknown_keys=False,
     ):
+        """
+        Initializes the OCM client.
+
+        Args:
+            token (str): The authentication token.
+            endpoint (str): The endpoint to connect to.
+            api_host (str, optional): The API host to use. Defaults to "production".
+            discard_unknown_keys (bool, optional): Whether to discard unknown keys in the response. Defaults to False.
+        """
         self.endpoint = endpoint
         self.token = token
         self.client_config = Configuration(
@@ -31,6 +44,16 @@ class OCMPythonClient(ApiClient):
         super().__init__(configuration=self.client_config)
 
     def __confirm_auth(self):
+        """
+        Confirms the authentication by making a POST request to the endpoint.
+
+        Returns:
+            str: The access token.
+
+        Raises:
+            AuthenticationError: If the token is expired.
+            EndpointAccessError: If the endpoint cannot be accessed.
+        """
         response = requests.post(
             self.endpoint,
             data={
@@ -58,6 +81,19 @@ class OCMPythonClient(ApiClient):
         return response.json()["access_token"]
 
     def call_api(self, *args, **kwargs):
+        """
+        Calls the API with the given arguments and keyword arguments.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            The response from the API call.
+
+        Raises:
+            UnauthorizedException: If the client is unauthorized.
+        """
         try:
             return super().call_api(*args, **kwargs)
         except UnauthorizedException:
@@ -67,10 +103,28 @@ class OCMPythonClient(ApiClient):
 
     @property
     def client(self):
+        """
+        Returns the default API client.
+
+        Returns:
+            DefaultApi: The default API client.
+        """
         return DefaultApi(api_client=self)
 
     @staticmethod
     def get_base_api_uri(api_host):
+        """
+        Gets the base API URI for the given API host.
+
+        Args:
+            api_host (str): The API host.
+
+        Returns:
+            str: The base API URI.
+
+        Raises:
+            ValueError: If the API host is not found in the configuration.
+        """
         api_hosts_config = Configuration().get_host_settings()
         host_config = [
             host["url"]

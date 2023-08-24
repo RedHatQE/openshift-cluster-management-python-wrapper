@@ -14,6 +14,7 @@ from ocm_python_client.model.add_on_installation_parameter import (
     AddOnInstallationParameter,
 )
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
+from ocp_resources.cluster_operator import ClusterOperator
 from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
 from ocp_resources.resource import ResourceEditor
@@ -265,6 +266,26 @@ class Cluster:
         channel_group="stable",
         expiration_time=None,
     ):
+        """
+        Constructs a dictionary with the configuration for an OSD AWS cluster.
+
+        Args:
+            name (str): The name of the cluster.
+            region (str): The region where the cluster will be deployed.
+            ocp_version (str): The OpenShift version for the cluster.
+            access_key_id (str): The AWS access key ID.
+            account_id (str): The AWS account ID.
+            secret_access_key (str): The AWS secret access key.
+            replicas (int, optional): The number of replicas for the cluster. Defaults to 2.
+            compute_machine_type (str, optional): The type of compute machine for the cluster. Defaults to "m5.4xlarge".
+            multi_az (bool, optional): Whether to use multiple availability zones. Defaults to False.
+            channel_group (str, optional): The channel group for the cluster. Defaults to "stable".
+            expiration_time (str, optional): The expiration time for the cluster. Defaults to None.
+                Example: f"{(datetime.now() + timedelta(seconds=3600)).isoformat()}Z"
+
+        Returns:
+            dict: A dictionary with the configuration for an OSD AWS cluster.
+        """
         _cluster_dict = {
             "name": name,
             "region": {"id": region},
@@ -314,7 +335,38 @@ class Cluster:
         cluster_dict=None,
         wait_for_ready=False,
         wait_timeout=TIMEOUT_30MIN,
+        clusters_operator_wait_timeout=TIMEOUT_30MIN,
     ):
+        """
+        Provisions an OSD AWS cluster.
+
+        Args:
+            client (object): The client object.
+            name (str, optional): The name of the cluster. Defaults to None.
+            region (str, optional): The region where the cluster will be deployed. Defaults to None.
+            ocp_version (str, optional): The OpenShift version for the cluster. Defaults to None.
+            access_key_id (str, optional): The AWS access key ID. Defaults to None.
+            account_id (str, optional): The AWS account ID. Defaults to None.
+            secret_access_key (str, optional): The AWS secret access key. Defaults to None.
+            replicas (int, optional): The number of replicas for the cluster. Defaults to 2.
+            compute_machine_type (str, optional): The type of compute machine for the cluster. Defaults to "m5.4xlarge".
+            multi_az (bool, optional): Whether to use multiple availability zones. Defaults to False.
+            channel_group (str, optional): The channel group for the cluster. Defaults to "stable".
+            expiration_time (str, optional): The expiration time for the cluster. Defaults to None.
+                Example: f"{(datetime.now() + timedelta(seconds=3600)).isoformat()}Z"
+            cluster_dict (dict, optional): A dictionary with the configuration for an OSD AWS cluster. Defaults to None.
+            wait_for_ready (bool, optional): Whether to wait for the cluster to be ready. Defaults to False.
+            wait_timeout (int, optional): The timeout in seconds to wait for the cluster to be ready.
+                Defaults to TIMEOUT_30MIN.
+            clusters_operator_wait_timeout (int, optional): The timeout in seconds to wait for the cluster operators
+                to be in Progressing=False status. Defaults to TIMEOUT_30MIN.
+
+        Returns:
+            object: The cluster object.
+
+        Raises:
+            ValueError: If any required attributes are missing.
+        """
         if cluster_dict:
             _cluster_dict = cluster_dict
         else:
@@ -364,8 +416,43 @@ class Cluster:
 
         if wait_for_ready:
             cluster_object.wait_for_cluster_ready(wait_timeout=wait_timeout)
+            cluster_object.wait_for_cluster_operators_progressing_false(
+                clusters_operator_wait_timeout=clusters_operator_wait_timeout
+            )
 
         return cluster_object
+
+    def wait_for_cluster_operators_progressing_false(
+        self, cluster_operators_wait_timeout=TIMEOUT_30MIN
+    ):
+        progressing_operators = []
+        client = self.ocp_client
+        try:
+            for cluster_operators in TimeoutSampler(
+                wait_timeout=cluster_operators_wait_timeout,
+                sleep=SLEEP_1SEC,
+                func=ClusterOperator.get,
+                client=client,
+            ):
+                progressing_operators = []
+                for cluster_operator in cluster_operators:
+                    for cond in cluster_operator.instance.get("status", {}).get(
+                        "conditions", []
+                    ):
+                        if (
+                            cond["type"] == cluster_operator.Condition.PROGRESSING
+                            and cond["status"] == cluster_operator.Condition.Status.TRUE
+                        ):
+                            progressing_operators.append(cluster_operator.name)
+
+                if not progressing_operators:
+                    return
+        except TimeoutExpiredError:
+            LOGGER.error(
+                "The following cluster operators are still progressing:"
+                f" {progressing_operators}"
+            )
+            raise
 
 
 class ClusterAddOn(Cluster):
