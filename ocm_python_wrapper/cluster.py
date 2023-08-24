@@ -1,6 +1,5 @@
 import inspect
 import os
-from datetime import datetime, timedelta
 from importlib.util import find_spec
 
 import rosa.cli as rosa_cli
@@ -24,7 +23,6 @@ from ocp_utilities.infra import create_icsp, create_update_secret, get_client
 from simple_logger.logger import get_logger
 
 from ocm_python_wrapper.exceptions import MissingResourceError
-from ocm_python_wrapper.helper import tts
 
 LOGGER = get_logger(__name__)
 TIMEOUT_5MIN = 5 * 60
@@ -265,12 +263,9 @@ class Cluster:
         compute_machine_type="m5.4xlarge",
         multi_az=False,
         channel_group="stable",
-        expiration_time="24h",
+        expiration_time=None,
     ):
-        _expiration_time = (
-            f"{(datetime.now() + timedelta(seconds=tts(ts=expiration_time))).isoformat()}Z"
-        )
-        return {
+        _cluster_dict = {
             "name": name,
             "region": {"id": region},
             "nodes": {
@@ -294,8 +289,12 @@ class Cluster:
                 "account_id": account_id,
                 "secret_access_key": secret_access_key,
             },
-            "expiration_time": _expiration_time,
         }
+
+        if expiration_time:
+            _cluster_dict["expiration_time"] = expiration_time
+
+        return _cluster_dict
 
     @classmethod
     def provision_osd_aws(
@@ -311,7 +310,7 @@ class Cluster:
         compute_machine_type="m5.4xlarge",
         multi_az=False,
         channel_group="stable",
-        expiration_time="24h",
+        expiration_time=None,
         cluster_dict=None,
         wait_for_ready=False,
         wait_timeout=TIMEOUT_30MIN,
