@@ -415,7 +415,7 @@ class Cluster:
             watcher = TimeoutWatch(timeout=wait_timeout)
             cluster_object.wait_for_cluster_ready(wait_timeout=wait_timeout)
             cluster_object.wait_for_cluster_operators_progressing_false(
-                wait_timeout=watcher.remaining_time() - wait_timeout
+                wait_timeout=wait_timeout - watcher.remaining_time()
             )
 
         return cluster_object
