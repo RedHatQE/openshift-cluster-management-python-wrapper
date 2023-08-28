@@ -19,7 +19,7 @@ from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 from ocp_utilities.infra import create_icsp, create_update_secret, get_client
 from simple_logger.logger import get_logger
 
@@ -335,7 +335,6 @@ class Cluster:
         cluster_dict=None,
         wait_for_ready=False,
         wait_timeout=TIMEOUT_30MIN,
-        cluster_operators_wait_timeout=TIMEOUT_30MIN,
     ):
         """
         Provisions an OSD AWS cluster.
@@ -358,8 +357,6 @@ class Cluster:
             wait_for_ready (bool, optional): Whether to wait for the cluster to be ready. Defaults to False.
             wait_timeout (int, optional): The timeout in seconds to wait for the cluster to be ready.
                 Defaults to TIMEOUT_30MIN.
-            cluster_operators_wait_timeout (int, optional): The timeout in seconds to wait for the cluster operators
-                to be in Progressing=False status. Defaults to TIMEOUT_30MIN.
 
         Returns:
             object: The cluster object.
@@ -415,21 +412,20 @@ class Cluster:
                 break
 
         if wait_for_ready:
+            watcher = TimeoutWatch(timeout=wait_timeout)
             cluster_object.wait_for_cluster_ready(wait_timeout=wait_timeout)
             cluster_object.wait_for_cluster_operators_progressing_false(
-                cluster_operators_wait_timeout=cluster_operators_wait_timeout
+                wait_timeout=watcher.remaining_time() - wait_timeout
             )
 
         return cluster_object
 
-    def wait_for_cluster_operators_progressing_false(
-        self, cluster_operators_wait_timeout=TIMEOUT_30MIN
-    ):
+    def wait_for_cluster_operators_progressing_false(self, wait_timeout=TIMEOUT_30MIN):
         progressing_operators = []
         client = self.ocp_client
         try:
             for cluster_operators in TimeoutSampler(
-                wait_timeout=cluster_operators_wait_timeout,
+                wait_timeout=wait_timeout,
                 sleep=SLEEP_1SEC,
                 func=ClusterOperator.get,
                 client=client,
