@@ -335,7 +335,7 @@ class Cluster:
         cluster_dict=None,
         wait_for_ready=False,
         wait_timeout=TIMEOUT_30MIN,
-        clusters_operator_wait_timeout=TIMEOUT_30MIN,
+        cluster_operators_wait_timeout=TIMEOUT_30MIN,
     ):
         """
         Provisions an OSD AWS cluster.
@@ -358,7 +358,7 @@ class Cluster:
             wait_for_ready (bool, optional): Whether to wait for the cluster to be ready. Defaults to False.
             wait_timeout (int, optional): The timeout in seconds to wait for the cluster to be ready.
                 Defaults to TIMEOUT_30MIN.
-            clusters_operator_wait_timeout (int, optional): The timeout in seconds to wait for the cluster operators
+            cluster_operators_wait_timeout (int, optional): The timeout in seconds to wait for the cluster operators
                 to be in Progressing=False status. Defaults to TIMEOUT_30MIN.
 
         Returns:
@@ -417,7 +417,7 @@ class Cluster:
         if wait_for_ready:
             cluster_object.wait_for_cluster_ready(wait_timeout=wait_timeout)
             cluster_object.wait_for_cluster_operators_progressing_false(
-                clusters_operator_wait_timeout=clusters_operator_wait_timeout
+                cluster_operators_wait_timeout=cluster_operators_wait_timeout
             )
 
         return cluster_object
