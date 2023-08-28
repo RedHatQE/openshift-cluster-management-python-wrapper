@@ -3,6 +3,7 @@ import os
 from importlib.util import find_spec
 
 import rosa.cli as rosa_cli
+import urllib3
 import yaml
 from benedict import benedict
 from clouds.aws.roles.roles import create_or_update_role_policy
@@ -421,8 +422,11 @@ class Cluster:
         return cluster_object
 
     def wait_for_cluster_operators_progressing_false(self, wait_timeout=TIMEOUT_30MIN):
+        urllib3.disable_warnings()
         progressing_operators = []
         client = self.ocp_client
+
+        LOGGER.info(f"Wait for cluster {self.name} operators to be ready.")
         try:
             for cluster_operators in TimeoutSampler(
                 wait_timeout=wait_timeout,
