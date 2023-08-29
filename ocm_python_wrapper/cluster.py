@@ -433,6 +433,7 @@ class Cluster:
                 sleep=SLEEP_1SEC,
                 func=ClusterOperator.get,
                 client=client,
+                exceptions_dict={Exception: []},
             ):
                 progressing_operators = []
                 for cluster_operator in cluster_operators:
