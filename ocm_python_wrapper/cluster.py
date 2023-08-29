@@ -209,16 +209,25 @@ class Cluster:
             LOGGER.error(f"Timeout waiting for cluster {self.name} to be deleted")
             raise
 
-    def wait_for_cluster_ready(self, wait_timeout=TIMEOUT_30MIN):
+    def wait_for_cluster_ready(self, wait_timeout=TIMEOUT_30MIN, stop_status=None):
         LOGGER.info(f"Wait for cluster {self.name} to be ready.")
+        stop_status = stop_status or "error"
+
         try:
             for sample in TimeoutSampler(
                 wait_timeout=wait_timeout,
                 sleep=SLEEP_1SEC,
                 func=lambda: self.instance,
             ):
-                if sample and str(sample.state) == "ready":
-                    return True
+                if sample:
+                    current_status = str(sample.state)
+                    if current_status == "ready":
+                        return True
+                    if current_status == stop_status:
+                        raise TimeoutExpiredError(
+                            f"Status of cluster {self.name} is {current_status}"
+                        )
+
         except TimeoutExpiredError:
             LOGGER.error("Timeout waiting for cluster to be ready")
             raise
