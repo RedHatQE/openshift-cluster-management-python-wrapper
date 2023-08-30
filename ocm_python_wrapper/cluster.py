@@ -441,7 +441,7 @@ class Cluster:
                 wait_timeout=wait_timeout,
                 sleep=SLEEP_1SEC,
                 func=ClusterOperator.get,
-                client=client,
+                dyn_client=client,
                 exceptions_dict={Exception: []},
             ):
                 progressing_operators = []
