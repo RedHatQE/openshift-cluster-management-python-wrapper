@@ -441,7 +441,9 @@ class Cluster:
             namespace="openshift-monitoring",
         )
         job.wait_for_condition(
-            condition=job.Condition.COMPLETE, status="True", timeout=wait_timeout
+            condition=job.Condition.COMPLETE,
+            status=job.Condition.Status.TRUE,
+            timeout=wait_timeout,
         )
 
 
