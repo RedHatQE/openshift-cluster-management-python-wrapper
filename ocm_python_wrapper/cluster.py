@@ -3,7 +3,6 @@ import os
 from importlib.util import find_spec
 
 import rosa.cli as rosa_cli
-import urllib3
 import yaml
 from benedict import benedict
 from clouds.aws.roles.roles import create_or_update_role_policy
@@ -15,9 +14,9 @@ from ocm_python_client.model.add_on_installation_parameter import (
     AddOnInstallationParameter,
 )
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
-from ocp_resources.cluster_operator import ClusterOperator
 from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
+from ocp_resources.job import Job
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
@@ -30,6 +29,7 @@ LOGGER = get_logger(__name__)
 TIMEOUT_5MIN = 5 * 60
 TIMEOUT_10MIN = 10 * 60
 TIMEOUT_30MIN = 30 * 60
+TIMEOUT_60MIN = 60 * 60
 SLEEP_1SEC = 1
 
 
@@ -209,9 +209,12 @@ class Cluster:
             LOGGER.error(f"Timeout waiting for cluster {self.name} to be deleted")
             raise
 
-    def wait_for_cluster_ready(self, wait_timeout=TIMEOUT_30MIN, stop_status=None):
+    def wait_for_cluster_ready(
+        self, wait_timeout=TIMEOUT_30MIN, stop_status=None, wait_for_osd_job=True
+    ):
         LOGGER.info(f"Wait for cluster {self.name} to be ready.")
         stop_status = stop_status or "error"
+        time_watcher = TimeoutWatch(timeout=wait_timeout)
 
         try:
             for sample in TimeoutSampler(
@@ -231,6 +234,11 @@ class Cluster:
         except TimeoutExpiredError:
             LOGGER.error("Timeout waiting for cluster to be ready")
             raise
+
+        if wait_for_osd_job and not self.hypershift:
+            self.wait_for_osd_cluster_ready_job(
+                wait_timeout=time_watcher.remaining_time()
+            )
 
     @property
     def exists(self):
@@ -422,47 +430,19 @@ class Cluster:
                 break
 
         if wait_for_ready:
-            watcher = TimeoutWatch(timeout=wait_timeout)
             cluster_object.wait_for_cluster_ready(wait_timeout=wait_timeout)
-            cluster_object.wait_for_cluster_operators_progressing_false(
-                wait_timeout=watcher.remaining_time()
-            )
 
         return cluster_object
 
-    def wait_for_cluster_operators_progressing_false(self, wait_timeout=TIMEOUT_30MIN):
-        urllib3.disable_warnings()
-        progressing_operators = []
-        client = self.ocp_client
-
-        LOGGER.info(f"Wait for cluster {self.name} operators to be ready.")
-        try:
-            for cluster_operators in TimeoutSampler(
-                wait_timeout=wait_timeout,
-                sleep=SLEEP_1SEC,
-                func=ClusterOperator.get,
-                dyn_client=client,
-                exceptions_dict={Exception: []},
-            ):
-                progressing_operators = []
-                for cluster_operator in cluster_operators:
-                    for cond in cluster_operator.instance.get("status", {}).get(
-                        "conditions", []
-                    ):
-                        if (
-                            cond["type"] == cluster_operator.Condition.PROGRESSING
-                            and cond["status"] == cluster_operator.Condition.Status.TRUE
-                        ):
-                            progressing_operators.append(cluster_operator.name)
-
-                if not progressing_operators:
-                    return
-        except TimeoutExpiredError:
-            LOGGER.error(
-                "The following cluster operators are still progressing:"
-                f" {progressing_operators}"
-            )
-            raise
+    def wait_for_osd_cluster_ready_job(self, wait_timeout=TIMEOUT_60MIN):
+        job = Job(
+            client=self.ocp_client,
+            name="osd-cluster-ready",
+            namespace="openshift-monitoring",
+        )
+        job.wait_for_condition(
+            condition=job.Condition.COMPLETE, status="True", timeout=wait_timeout
+        )
 
 
 class ClusterAddOn(Cluster):
