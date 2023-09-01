@@ -225,7 +225,7 @@ class Cluster:
                 if sample:
                     current_status = str(sample.state)
                     if current_status == "ready":
-                        return True
+                        break
                     if current_status == stop_status:
                         raise TimeoutExpiredError(
                             f"Status of cluster {self.name} is {current_status}"
@@ -239,6 +239,8 @@ class Cluster:
             self.wait_for_osd_cluster_ready_job(
                 wait_timeout=time_watcher.remaining_time()
             )
+
+        return True
 
     @property
     def exists(self):
