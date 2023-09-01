@@ -528,12 +528,12 @@ PyYAML = "*"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "4.14.28"
+version = "4.14.29"
 description = "Wrapper around https://github.com/openshift/openshift-restclient-python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_wrapper-4.14.28.tar.gz", hash = "sha256:1c960faeac2171467051933e5f1a641b5a4121376c9c1eed51c3510b314e2a58"},
+    {file = "openshift_python_wrapper-4.14.29.tar.gz", hash = "sha256:9739cf8871bbf78bd0fe00df4c6a2dd9724cdd5cd11a6e84f62e9606752782a4"},
 ]
 
 [package.dependencies]
