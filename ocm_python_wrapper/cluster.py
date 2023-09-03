@@ -14,12 +14,12 @@ from ocm_python_client.model.add_on_installation_parameter import (
     AddOnInstallationParameter,
 )
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
-from ocp_resources.cluster_operator import ClusterOperator
 from ocp_resources.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
+from ocp_resources.job import Job
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler
+from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 from ocp_utilities.infra import create_icsp, create_update_secret, get_client
 from simple_logger.logger import get_logger
 
@@ -29,6 +29,7 @@ LOGGER = get_logger(__name__)
 TIMEOUT_5MIN = 5 * 60
 TIMEOUT_10MIN = 10 * 60
 TIMEOUT_30MIN = 30 * 60
+TIMEOUT_60MIN = 60 * 60
 SLEEP_1SEC = 1
 
 
@@ -208,19 +209,38 @@ class Cluster:
             LOGGER.error(f"Timeout waiting for cluster {self.name} to be deleted")
             raise
 
-    def wait_for_cluster_ready(self, wait_timeout=TIMEOUT_30MIN):
+    def wait_for_cluster_ready(
+        self, wait_timeout=TIMEOUT_30MIN, stop_status=None, wait_for_osd_job=True
+    ):
         LOGGER.info(f"Wait for cluster {self.name} to be ready.")
+        stop_status = stop_status or "error"
+        time_watcher = TimeoutWatch(timeout=wait_timeout)
+
         try:
             for sample in TimeoutSampler(
                 wait_timeout=wait_timeout,
                 sleep=SLEEP_1SEC,
                 func=lambda: self.instance,
             ):
-                if sample and str(sample.state) == "ready":
-                    return True
+                if sample:
+                    current_status = str(sample.state)
+                    if current_status == "ready":
+                        break
+                    if current_status == stop_status:
+                        raise TimeoutExpiredError(
+                            f"Status of cluster {self.name} is {current_status}"
+                        )
+
         except TimeoutExpiredError:
             LOGGER.error("Timeout waiting for cluster to be ready")
             raise
+
+        if wait_for_osd_job and not self.hypershift:
+            self.wait_for_osd_cluster_ready_job(
+                wait_timeout=time_watcher.remaining_time()
+            )
+
+        return True
 
     @property
     def exists(self):
@@ -335,7 +355,6 @@ class Cluster:
         cluster_dict=None,
         wait_for_ready=False,
         wait_timeout=TIMEOUT_30MIN,
-        clusters_operator_wait_timeout=TIMEOUT_30MIN,
     ):
         """
         Provisions an OSD AWS cluster.
@@ -358,8 +377,6 @@ class Cluster:
             wait_for_ready (bool, optional): Whether to wait for the cluster to be ready. Defaults to False.
             wait_timeout (int, optional): The timeout in seconds to wait for the cluster to be ready.
                 Defaults to TIMEOUT_30MIN.
-            clusters_operator_wait_timeout (int, optional): The timeout in seconds to wait for the cluster operators
-                to be in Progressing=False status. Defaults to TIMEOUT_30MIN.
 
         Returns:
             object: The cluster object.
@@ -416,43 +433,20 @@ class Cluster:
 
         if wait_for_ready:
             cluster_object.wait_for_cluster_ready(wait_timeout=wait_timeout)
-            cluster_object.wait_for_cluster_operators_progressing_false(
-                clusters_operator_wait_timeout=clusters_operator_wait_timeout
-            )
 
         return cluster_object
 
-    def wait_for_cluster_operators_progressing_false(
-        self, cluster_operators_wait_timeout=TIMEOUT_30MIN
-    ):
-        progressing_operators = []
-        client = self.ocp_client
-        try:
-            for cluster_operators in TimeoutSampler(
-                wait_timeout=cluster_operators_wait_timeout,
-                sleep=SLEEP_1SEC,
-                func=ClusterOperator.get,
-                client=client,
-            ):
-                progressing_operators = []
-                for cluster_operator in cluster_operators:
-                    for cond in cluster_operator.instance.get("status", {}).get(
-                        "conditions", []
-                    ):
-                        if (
-                            cond["type"] == cluster_operator.Condition.PROGRESSING
-                            and cond["status"] == cluster_operator.Condition.Status.TRUE
-                        ):
-                            progressing_operators.append(cluster_operator.name)
-
-                if not progressing_operators:
-                    return
-        except TimeoutExpiredError:
-            LOGGER.error(
-                "The following cluster operators are still progressing:"
-                f" {progressing_operators}"
-            )
-            raise
+    def wait_for_osd_cluster_ready_job(self, wait_timeout=TIMEOUT_60MIN):
+        job = Job(
+            client=self.ocp_client,
+            name="osd-cluster-ready",
+            namespace="openshift-monitoring",
+        )
+        job.wait_for_condition(
+            condition=job.Condition.COMPLETE,
+            status=job.Condition.Status.TRUE,
+            timeout=wait_timeout,
+        )
 
 
 class ClusterAddOn(Cluster):
