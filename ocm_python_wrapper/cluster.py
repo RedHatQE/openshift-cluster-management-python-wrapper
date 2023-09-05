@@ -384,7 +384,6 @@ class Cluster:
             missing_attributes = [
                 attr_name
                 for attr_name in [
-                    "name",
                     "region",
                     "ocp_version",
                     "access_key_id",
