@@ -1,3 +1,4 @@
+import functools
 import inspect
 import os
 from importlib.util import find_spec
@@ -44,17 +45,10 @@ class Clusters:
 
 
 class Cluster:
-    def __init__(
-        self,
-        client,
-        name,
-    ):
+    def __init__(self, client, name):
         self.client = client
         self.name = name
-        self.cluster_id = self._cluster_id()
-        self.hypershift = self.is_hypershift
-        self.rosa = self._is_rosa
-        self.region = self._region
+        self.cluster_id = None
 
     def _cluster_id(self):
         cluster_list = self.client.api_clusters_mgmt_v1_clusters_get(
@@ -66,6 +60,9 @@ class Cluster:
 
     @property
     def instance(self):
+        if not self.cluster_id:
+            self.cluster_id = self._cluster_id()
+
         return self.client.api_clusters_mgmt_v1_clusters_cluster_id_get(
             cluster_id=self.cluster_id
         )
@@ -184,7 +181,8 @@ class Cluster:
             raise
 
     @property
-    def is_hypershift(self):
+    @functools.cache
+    def hypershift(self):
         return self.instance.hypershift.enabled is True
 
     def delete(self, wait=True, timeout=1800, deprovision=True):
@@ -257,24 +255,24 @@ class Cluster:
         return self.instance.cloud_provider.id if self.exists else None
 
     @property
-    def _is_rosa(self):
+    @functools.cache
+    def rosa(self):
         return (
             self.instance.get("aws", {}).get("tags", {}).get("red-hat-clustertype")
             == "rosa"
         )
 
     @property
-    def _region(self):
+    @functools.cache
+    def region(self):
         return self.instance.get("region", {}).get("id")
 
     @property
     def kubeadmin_password(self):
         return self.credentials.admin.password
 
-    @classmethod
     def osd_aws_dict(
-        cls,
-        name,
+        self,
         region,
         ocp_version,
         access_key_id,
@@ -290,7 +288,6 @@ class Cluster:
         Constructs a dictionary with the configuration for an OSD AWS cluster.
 
         Args:
-            name (str): The name of the cluster.
             region (str): The region where the cluster will be deployed.
             ocp_version (str): The OpenShift version for the cluster.
             access_key_id (str): The AWS access key ID.
@@ -307,7 +304,7 @@ class Cluster:
             dict: A dictionary with the configuration for an OSD AWS cluster.
         """
         _cluster_dict = {
-            "name": name,
+            "name": self.name,
             "region": {"id": region},
             "nodes": {
                 "compute_machine_type": {"id": compute_machine_type},
@@ -337,11 +334,8 @@ class Cluster:
 
         return _cluster_dict
 
-    @classmethod
     def provision_osd_aws(
-        cls,
-        client,
-        name=None,
+        self,
         region=None,
         ocp_version=None,
         access_key_id=None,
@@ -360,8 +354,6 @@ class Cluster:
         Provisions an OSD AWS cluster.
 
         Args:
-            client (object): The client object.
-            name (str, optional): The name of the cluster. Defaults to None.
             region (str, optional): The region where the cluster will be deployed. Defaults to None.
             ocp_version (str, optional): The OpenShift version for the cluster. Defaults to None.
             access_key_id (str, optional): The AWS access key ID. Defaults to None.
@@ -405,8 +397,7 @@ class Cluster:
             if missing_attributes:
                 raise ValueError(f"Missing attributes: {missing_attributes}")
 
-            _cluster_dict = cls.osd_aws_dict(
-                name=name,
+            _cluster_dict = self.osd_aws_dict(
                 region=region,
                 ocp_version=ocp_version,
                 access_key_id=access_key_id,
@@ -419,22 +410,19 @@ class Cluster:
                 expiration_time=expiration_time,
             )
 
-        client.api_clusters_mgmt_v1_clusters_post(cluster=_cluster_dict)
-        cluster_object = None
+        self.client.api_clusters_mgmt_v1_clusters_post(cluster=_cluster_dict)
         for cluster_object in TimeoutSampler(
             wait_timeout=TIMEOUT_30MIN,
             sleep=SLEEP_1SEC,
-            func=cls,
-            client=client,
-            name=name,
+            func=lambda: self.exists,
         ):
             if cluster_object:
                 break
 
         if wait_for_ready:
-            cluster_object.wait_for_cluster_ready(wait_timeout=wait_timeout)
+            self.wait_for_cluster_ready(wait_timeout=wait_timeout)
 
-        return cluster_object
+        return self
 
     def wait_for_osd_cluster_ready_job(self, wait_timeout=TIMEOUT_60MIN):
         job = Job(
