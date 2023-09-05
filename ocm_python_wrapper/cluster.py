@@ -216,17 +216,18 @@ class Cluster:
     def wait_for_cluster_ready(
         self, wait_timeout=TIMEOUT_30MIN, stop_status=None, wait_for_osd_job=True
     ):
-        LOGGER.info(f"Wait for cluster {self.name} to be ready.")
         stop_status = stop_status or "error"
         time_watcher = TimeoutWatch(timeout=wait_timeout)
 
         try:
+            LOGGER.info(f"Wait for cluster {self.name} to be exists.")
             self.wait_exists(wait_timeout=wait_timeout)
         except TimeoutExpiredError:
             LOGGER.error(f"Timeout waiting for cluster {self.name} to be exists")
             raise
 
         try:
+            LOGGER.info(f"Wait for cluster {self.name} to be ready.")
             for sample in TimeoutSampler(
                 wait_timeout=time_watcher.remaining_time(),
                 sleep=SLEEP_1SEC,
