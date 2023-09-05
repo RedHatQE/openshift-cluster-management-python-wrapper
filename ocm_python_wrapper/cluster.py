@@ -260,7 +260,7 @@ class Cluster:
             func=lambda: self.exists,
         ):
             if sample:
-                return
+                return sample
 
     @property
     def cloud_provider(self):
