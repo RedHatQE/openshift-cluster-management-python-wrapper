@@ -190,7 +190,7 @@ class Cluster:
 
     def delete(self, wait=True, timeout=1800, deprovision=True):
         if not self.cluster_id:
-            raise MissingResourceError(f"cluster ID for cluster {self.name} not found")
+            raise MissingResourceError(kind="Cluster", name=self.name)
 
         LOGGER.info(f"Delete cluster {self.name}.")
         self.client.api_clusters_mgmt_v1_clusters_cluster_id_delete(
