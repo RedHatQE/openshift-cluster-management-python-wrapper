@@ -218,8 +218,14 @@ class Cluster:
         time_watcher = TimeoutWatch(timeout=wait_timeout)
 
         try:
+            self.wait_exists(wait_timeout=wait_timeout)
+        except TimeoutExpiredError:
+            LOGGER.error(f"Timeout waiting for cluster {self.name} to be exists")
+            raise
+
+        try:
             for sample in TimeoutSampler(
-                wait_timeout=wait_timeout,
+                wait_timeout=time_watcher.remaining_time(),
                 sleep=SLEEP_1SEC,
                 func=lambda: self.instance,
             ):
@@ -233,7 +239,7 @@ class Cluster:
                         )
 
         except TimeoutExpiredError:
-            LOGGER.error("Timeout waiting for cluster to be ready")
+            LOGGER.error(f"Timeout waiting for cluster {self.name} to be ready")
             raise
 
         if wait_for_osd_job and not self.hypershift:
