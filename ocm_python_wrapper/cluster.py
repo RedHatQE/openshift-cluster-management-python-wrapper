@@ -247,7 +247,7 @@ class Cluster:
                 wait_timeout=time_watcher.remaining_time()
             )
 
-        return True
+        return self
 
     @property
     def exists(self):
@@ -428,16 +428,11 @@ class Cluster:
             )
 
         self.client.api_clusters_mgmt_v1_clusters_post(cluster=_cluster_dict)
-        for cluster_object in TimeoutSampler(
-            wait_timeout=TIMEOUT_30MIN,
-            sleep=SLEEP_1SEC,
-            func=lambda: self.exists,
-        ):
-            if cluster_object:
-                break
+        time_watcher = TimeoutWatch(timeout=wait_timeout)
+        self.wait_exists(wait_timeout=wait_timeout)
 
         if wait_for_ready:
-            self.wait_for_cluster_ready(wait_timeout=wait_timeout)
+            self.wait_for_cluster_ready(wait_timeout=time_watcher.remaining_time())
 
         return self
 
