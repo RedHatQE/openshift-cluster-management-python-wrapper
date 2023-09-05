@@ -247,7 +247,7 @@ class Cluster:
         """
         try:
             return self.instance
-        except NotFoundException:
+        except (NotFoundException, MissingResourceError):
             return None
 
     @property
