@@ -48,7 +48,10 @@ class Cluster:
     def __init__(self, client, name):
         self.client = client
         self.name = name
-        self.cluster_id = None
+        try:
+            self.cluster_id = self._cluster_id()
+        except MissingResourceError:
+            self.cluster_id = None
 
     def _cluster_id(self):
         cluster_list = self.client.api_clusters_mgmt_v1_clusters_get(
