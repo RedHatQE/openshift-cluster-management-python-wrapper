@@ -189,6 +189,9 @@ class Cluster:
         return self.instance.hypershift.enabled is True
 
     def delete(self, wait=True, timeout=1800, deprovision=True):
+        if not self.cluster_id:
+            raise MissingResourceError(kind="Cluster", name=self.name)
+
         LOGGER.info(f"Delete cluster {self.name}.")
         self.client.api_clusters_mgmt_v1_clusters_cluster_id_delete(
             cluster_id=self.cluster_id, deprovision=deprovision
@@ -213,13 +216,20 @@ class Cluster:
     def wait_for_cluster_ready(
         self, wait_timeout=TIMEOUT_30MIN, stop_status=None, wait_for_osd_job=True
     ):
-        LOGGER.info(f"Wait for cluster {self.name} to be ready.")
         stop_status = stop_status or "error"
         time_watcher = TimeoutWatch(timeout=wait_timeout)
 
         try:
+            LOGGER.info(f"Wait for cluster {self.name} to be exists.")
+            self.wait_exists(wait_timeout=wait_timeout)
+        except TimeoutExpiredError:
+            LOGGER.error(f"Timeout waiting for cluster {self.name} to be exists")
+            raise
+
+        try:
+            LOGGER.info(f"Wait for cluster {self.name} to be ready.")
             for sample in TimeoutSampler(
-                wait_timeout=wait_timeout,
+                wait_timeout=time_watcher.remaining_time(),
                 sleep=SLEEP_1SEC,
                 func=lambda: self.instance,
             ):
@@ -233,7 +243,7 @@ class Cluster:
                         )
 
         except TimeoutExpiredError:
-            LOGGER.error("Timeout waiting for cluster to be ready")
+            LOGGER.error(f"Timeout waiting for cluster {self.name} to be ready")
             raise
 
         if wait_for_osd_job and not self.hypershift:
@@ -241,7 +251,7 @@ class Cluster:
                 wait_timeout=time_watcher.remaining_time()
             )
 
-        return True
+        return self
 
     @property
     def exists(self):
@@ -252,6 +262,15 @@ class Cluster:
             return self.instance
         except (NotFoundException, MissingResourceError):
             return None
+
+    def wait_exists(self, wait_timeout):
+        for sample in TimeoutSampler(
+            wait_timeout=wait_timeout,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                return sample
 
     @property
     def cloud_provider(self):
@@ -413,16 +432,11 @@ class Cluster:
             )
 
         self.client.api_clusters_mgmt_v1_clusters_post(cluster=_cluster_dict)
-        for cluster_object in TimeoutSampler(
-            wait_timeout=TIMEOUT_30MIN,
-            sleep=SLEEP_1SEC,
-            func=lambda: self.exists,
-        ):
-            if cluster_object:
-                break
+        time_watcher = TimeoutWatch(timeout=wait_timeout)
+        self.wait_exists(wait_timeout=wait_timeout)
 
         if wait_for_ready:
-            self.wait_for_cluster_ready(wait_timeout=wait_timeout)
+            self.wait_for_cluster_ready(wait_timeout=time_watcher.remaining_time())
 
         return self
 
