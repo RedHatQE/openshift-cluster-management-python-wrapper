@@ -253,6 +253,15 @@ class Cluster:
         except (NotFoundException, MissingResourceError):
             return None
 
+    def wait_exists(self, wait_timeout):
+        for sample in TimeoutSampler(
+            wait_timeout=wait_timeout,
+            sleep=1,
+            func=lambda: self.exists,
+        ):
+            if sample:
+                return
+
     @property
     def cloud_provider(self):
         return self.instance.cloud_provider.id if self.exists else None
