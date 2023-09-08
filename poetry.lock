@@ -528,21 +528,20 @@ PyYAML = "*"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "4.14.34"
-description = "Wrapper around https://github.com/openshift/openshift-restclient-python"
+version = "4.15.1"
+description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_wrapper-4.14.34.tar.gz", hash = "sha256:0920ce265fce75c15e0124e2d3bd37678dbe43191a0f8f04fed0f8a141b92717"},
+    {file = "openshift_python_wrapper-4.15.1.tar.gz", hash = "sha256:18888bf3661155051fe17f6f217eef235e6089c20ade65e1409f279ffb4035b6"},
 ]
 
 [package.dependencies]
 colorlog = ">=6.7.0,<7.0.0"
 kubernetes = ">=27.2.0,<28.0.0"
-openshift = ">=0.13.2,<0.14.0"
 packaging = ">=23.1,<24.0"
 python-benedict = ">=0.32.0,<0.33.0"
-python-simple-logger = ">=1.0.5,<2.0.0"
+python-simple-logger = ">=1.0.6,<2.0.0"
 xmltodict = ">=0.13.0,<0.14.0"
 
 [[package]]
