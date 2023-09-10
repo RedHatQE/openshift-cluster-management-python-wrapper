@@ -423,13 +423,13 @@ files = [
 
 [[package]]
 name = "kubernetes"
-version = "27.2.0"
+version = "28.1.0b1"
 description = "Kubernetes python client"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "kubernetes-27.2.0-py2.py3-none-any.whl", hash = "sha256:0f9376329c85cf07615ed6886bf9bf21eb1cbfc05e14ec7b0f74ed8153cd2815"},
-    {file = "kubernetes-27.2.0.tar.gz", hash = "sha256:d479931c6f37561dbfdf28fc5f46384b1cb8b28f9db344ed4a232ce91990825a"},
+    {file = "kubernetes-28.1.0b1-py2.py3-none-any.whl", hash = "sha256:4f1c255e2bb30272487530965c5bb0d1b153cf3d3601247bb81147c7e46a9660"},
+    {file = "kubernetes-28.1.0b1.tar.gz", hash = "sha256:7080cbfbcddc53d063f08811316295bfac1df48248822459f5cc25e96dfccbe2"},
 ]
 
 [package.dependencies]
@@ -441,7 +441,7 @@ pyyaml = ">=5.4.1"
 requests = "*"
 requests-oauthlib = "*"
 six = ">=1.9.0"
-urllib3 = ">=1.24.2"
+urllib3 = ">=1.24.2,<2.0"
 websocket-client = ">=0.32.0,<0.40.0 || >0.40.0,<0.41.dev0 || >=0.43.dev0"
 
 [package.extras]
@@ -528,17 +528,17 @@ PyYAML = "*"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "4.15.1"
+version = "4.15.2"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_wrapper-4.15.1.tar.gz", hash = "sha256:18888bf3661155051fe17f6f217eef235e6089c20ade65e1409f279ffb4035b6"},
+    {file = "openshift_python_wrapper-4.15.2.tar.gz", hash = "sha256:97573cfe4def49a4e240d03d8375020d029116d274467fe97ef7ff6f4bbc328a"},
 ]
 
 [package.dependencies]
 colorlog = ">=6.7.0,<7.0.0"
-kubernetes = ">=27.2.0,<28.0.0"
+kubernetes = ">=28.1.0b1,<29.0.0"
 packaging = ">=23.1,<24.0"
 python-benedict = ">=0.32.0,<0.33.0"
 python-simple-logger = ">=1.0.6,<2.0.0"
