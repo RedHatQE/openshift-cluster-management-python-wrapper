@@ -48,7 +48,7 @@ openshift-cluster-management-python-client = "^1.0.23"
 openshift-python-wrapper = "^4.14.4"
 requests = "^2.31.0"
 pyyaml = "^6.0.1"
-openshift-python-utilities = "^4.14.2"
+openshift-python-utilities = "*"
 importlib = "^1.0.4"
 redhat-qe-cloud-tools = "^1.0.10"
 
