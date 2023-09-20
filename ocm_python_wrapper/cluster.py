@@ -361,7 +361,7 @@ class Cluster:
                 "secret_access_key": aws_secret_access_key,
             }
 
-        if platform == GCP_OSD_STR:
+        elif platform == GCP_OSD_STR:
             _cluster_dict[GCP_OSD_STR] = gcp_service_account
 
         if expiration_time:
@@ -430,7 +430,7 @@ class Cluster:
                     ]
                 )
 
-            if platform == GCP_OSD_STR:
+            elif platform == GCP_OSD_STR:
                 required_attributes.append("gcp_service_account")
             missing_attributes = [
                 attr_name
