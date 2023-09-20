@@ -32,6 +32,8 @@ TIMEOUT_10MIN = 10 * 60
 TIMEOUT_30MIN = 30 * 60
 TIMEOUT_60MIN = 60 * 60
 SLEEP_1SEC = 1
+AWS_OSD_STR = "aws"
+GCP_OSD_STR = "gcp"
 
 
 class Clusters:
@@ -280,7 +282,9 @@ class Cluster:
     @functools.cache
     def rosa(self):
         return (
-            self.instance.get("aws", {}).get("tags", {}).get("red-hat-clustertype")
+            self.instance.get(AWS_OSD_STR, {})
+            .get("tags", {})
+            .get("red-hat-clustertype")
             == "rosa"
         )
 
@@ -293,18 +297,20 @@ class Cluster:
     def kubeadmin_password(self):
         return self.credentials.admin.password
 
-    def osd_aws_dict(
+    def osd_dict(
         self,
         region,
         ocp_version,
-        access_key_id,
-        account_id,
-        secret_access_key,
+        aws_access_key_id=None,
+        aws_account_id=None,
+        aws_secret_access_key=None,
         replicas=2,
         compute_machine_type="m5.4xlarge",
         multi_az=False,
         channel_group="stable",
         expiration_time=None,
+        platform=None,
+        gcp_service_account=None,
     ):
         """
         Constructs a dictionary with the configuration for an OSD AWS cluster.
@@ -312,15 +318,17 @@ class Cluster:
         Args:
             region (str): The region where the cluster will be deployed.
             ocp_version (str): The OpenShift version for the cluster.
-            access_key_id (str): The AWS access key ID.
-            account_id (str): The AWS account ID.
-            secret_access_key (str): The AWS secret access key.
+            aws_access_key_id (str): The AWS access key ID.
+            aws_account_id (str): The AWS account ID.
+            aws_secret_access_key (str): The AWS secret access key.
             replicas (int, optional): The number of replicas for the cluster. Defaults to 2.
             compute_machine_type (str, optional): The type of compute machine for the cluster. Defaults to "m5.4xlarge".
             multi_az (bool, optional): Whether to use multiple availability zones. Defaults to False.
             channel_group (str, optional): The channel group for the cluster. Defaults to "stable".
             expiration_time (str, optional): The expiration time for the cluster. Defaults to None.
                 Example: f"{(datetime.now() + timedelta(seconds=3600)).isoformat()}Z"
+            platform (str): Target cluster platform. Supported: "aws" and "gpc"
+            gcp_service_account (dict, optional): GCP service account dict. Defaults to None.
 
         Returns:
             dict: A dictionary with the configuration for an OSD AWS cluster.
@@ -334,7 +342,7 @@ class Cluster:
             },
             "managed": True,
             "product": {"id": "osd"},
-            "cloud_provider": {"id": "aws"},
+            "cloud_provider": {"id": platform},
             "multi_az": multi_az,
             "etcd_encryption": True,
             "disable_user_workload_monitoring": True,
@@ -344,25 +352,30 @@ class Cluster:
             },
             "properties": {"use_local_credentials": "true"},
             "ccs": {"enabled": True, "disable_scp_checks": False},
-            "aws": {
-                "access_key_id": access_key_id,
-                "account_id": account_id,
-                "secret_access_key": secret_access_key,
-            },
         }
+
+        if platform == AWS_OSD_STR:
+            _cluster_dict[AWS_OSD_STR] = {
+                "access_key_id": aws_access_key_id,
+                "account_id": aws_account_id,
+                "secret_access_key": aws_secret_access_key,
+            }
+
+        if platform == GCP_OSD_STR:
+            _cluster_dict[GCP_OSD_STR] = gcp_service_account
 
         if expiration_time:
             _cluster_dict["expiration_time"] = expiration_time
 
         return _cluster_dict
 
-    def provision_osd_aws(
+    def provision_osd(
         self,
         region=None,
         ocp_version=None,
-        access_key_id=None,
-        account_id=None,
-        secret_access_key=None,
+        aws_access_key_id=None,
+        aws_account_id=None,
+        aws_secret_access_key=None,
         replicas=2,
         compute_machine_type="m5.4xlarge",
         multi_az=False,
@@ -371,6 +384,8 @@ class Cluster:
         cluster_dict=None,
         wait_for_ready=False,
         wait_timeout=TIMEOUT_30MIN,
+        platform=None,
+        gcp_service_account=None,
     ):
         """
         Provisions an OSD AWS cluster.
@@ -378,9 +393,9 @@ class Cluster:
         Args:
             region (str, optional): The region where the cluster will be deployed. Defaults to None.
             ocp_version (str, optional): The OpenShift version for the cluster. Defaults to None.
-            access_key_id (str, optional): The AWS access key ID. Defaults to None.
-            account_id (str, optional): The AWS account ID. Defaults to None.
-            secret_access_key (str, optional): The AWS secret access key. Defaults to None.
+            aws_access_key_id (str, optional): The AWS access key ID. Defaults to None.
+            aws_account_id (str, optional): The AWS account ID. Defaults to None.
+            aws_secret_access_key (str, optional): The AWS secret access key. Defaults to None.
             replicas (int, optional): The number of replicas for the cluster. Defaults to 2.
             compute_machine_type (str, optional): The type of compute machine for the cluster. Defaults to "m5.4xlarge".
             multi_az (bool, optional): Whether to use multiple availability zones. Defaults to False.
@@ -391,6 +406,8 @@ class Cluster:
             wait_for_ready (bool, optional): Whether to wait for the cluster to be ready. Defaults to False.
             wait_timeout (int, optional): The timeout in seconds to wait for the cluster to be ready.
                 Defaults to TIMEOUT_30MIN.
+            platform (str): Target cluster platform. Supported: "aws" and "gpc"
+            gcp_service_account (dict, optional): GCP service account dict. Defaults to None.
 
         Returns:
             object: The cluster object.
@@ -403,32 +420,40 @@ class Cluster:
         else:
             frame = inspect.currentframe()
             frame_values = inspect.getargvalues(frame)[3]
+            required_attributes = ["region", "ocp_version"]
+            if platform == AWS_OSD_STR:
+                required_attributes.extend(
+                    [
+                        "aws_access_key_id",
+                        "aws_account_id",
+                        "aws_secret_access_key",
+                    ]
+                )
+
+            if platform == GCP_OSD_STR:
+                required_attributes.append("gcp_service_account")
             missing_attributes = [
                 attr_name
-                for attr_name in [
-                    "region",
-                    "ocp_version",
-                    "access_key_id",
-                    "account_id",
-                    "secret_access_key",
-                ]
+                for attr_name in required_attributes
                 if not frame_values.get(attr_name)
             ]
 
             if missing_attributes:
                 raise ValueError(f"Missing attributes: {missing_attributes}")
 
-            _cluster_dict = self.osd_aws_dict(
+            _cluster_dict = self.osd_dict(
                 region=region,
                 ocp_version=ocp_version,
-                access_key_id=access_key_id,
-                account_id=account_id,
-                secret_access_key=secret_access_key,
+                aws_access_key_id=aws_access_key_id,
+                aws_account_id=aws_account_id,
+                aws_secret_access_key=aws_secret_access_key,
                 replicas=replicas,
                 compute_machine_type=compute_machine_type,
                 multi_az=multi_az,
                 channel_group=channel_group,
                 expiration_time=expiration_time,
+                platform=platform,
+                gcp_service_account=gcp_service_account,
             )
 
         self.client.api_clusters_mgmt_v1_clusters_post(cluster=_cluster_dict)
