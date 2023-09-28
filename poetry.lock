@@ -596,12 +596,12 @@ pyyaml = ">=6.0.1,<7.0.0"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "4.15.5"
+version = "4.15.6"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_wrapper-4.15.5.tar.gz", hash = "sha256:e4b743df93e01f77f6a4fa37d9550eb090e9b998fc151b7d7c86f8667621ba99"},
+    {file = "openshift_python_wrapper-4.15.6.tar.gz", hash = "sha256:648e77a0163eadaceafc740c6b324ec4138f58f793c3d1f0f0a45ba090385a42"},
 ]
 
 [package.dependencies]
