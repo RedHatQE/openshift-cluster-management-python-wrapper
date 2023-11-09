@@ -41,7 +41,7 @@ include = [{path = "manifests/*.json"}]
 [tool.poetry.dependencies]
 python = "^3.8"
 colorlog = "^6.7.0"
-python-benedict = "^0.32.0"
+python-benedict = "^0.33.0"
 python-simple-logger = "^1.0.5"
 rosa-python-client = "^1.0.28"
 openshift-cluster-management-python-client = "^1.0.23"
