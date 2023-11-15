@@ -26,7 +26,7 @@ from simple_logger.logger import get_logger
 
 from ocm_python_wrapper.exceptions import MissingResourceError
 
-LOGGER = get_logger(__name__)
+LOGGER = get_logger(name=__name__)
 TIMEOUT_5MIN = 5 * 60
 TIMEOUT_10MIN = 10 * 60
 TIMEOUT_30MIN = 30 * 60
@@ -56,9 +56,7 @@ class Cluster:
             self.cluster_id = None
 
     def _cluster_id(self):
-        cluster_list = self.client.api_clusters_mgmt_v1_clusters_get(
-            search=f"name like '{self.name}'"
-        ).items
+        cluster_list = self.client.api_clusters_mgmt_v1_clusters_get(search=f"name like '{self.name}'").items
         if cluster_list:
             return cluster_list[0].id
         raise MissingResourceError(name=self.name, kind="cluster")
@@ -68,16 +66,12 @@ class Cluster:
         if not self.cluster_id:
             self.cluster_id = self._cluster_id()
 
-        return self.client.api_clusters_mgmt_v1_clusters_cluster_id_get(
-            cluster_id=self.cluster_id
-        )
+        return self.client.api_clusters_mgmt_v1_clusters_cluster_id_get(cluster_id=self.cluster_id)
 
     # Cluster credentials
     @property
     def credentials(self):
-        return self.client.api_clusters_mgmt_v1_clusters_cluster_id_credentials_get(
-            cluster_id=self.cluster_id
-        )
+        return self.client.api_clusters_mgmt_v1_clusters_cluster_id_credentials_get(cluster_id=self.cluster_id)
 
     @property
     def kubeconfig(self):
@@ -93,9 +87,7 @@ class Cluster:
 
     # Cluster version
     def wait_for_ocm_cluster_version(self, ocp_target_version):
-        LOGGER.info(
-            f"Wait for cluster {self.name} version to be {ocp_target_version} in OCM."
-        )
+        LOGGER.info(f"Wait for cluster {self.name} version to be {ocp_target_version} in OCM.")
         samples = TimeoutSampler(
             wait_timeout=TIMEOUT_10MIN,
             sleep=10,
@@ -115,15 +107,11 @@ class Cluster:
     # Upgrade policies
     @property
     def upgrade_policies(self):
-        return (
-            self.client.api_clusters_mgmt_v1_clusters_cluster_id_upgrade_policies_get(
-                cluster_id=self.cluster_id
-            ).items
-        )
+        return self.client.api_clusters_mgmt_v1_clusters_cluster_id_upgrade_policies_get(
+            cluster_id=self.cluster_id
+        ).items
 
-    def update_upgrade_policies(
-        self, upgrade_policies_dict, wait=False, wait_timeout=TIMEOUT_10MIN
-    ):
+    def update_upgrade_policies(self, upgrade_policies_dict, wait=False, wait_timeout=TIMEOUT_10MIN):
         LOGGER.info("Update cluster upgrade policies.")
         try:
             self.client.api_clusters_mgmt_v1_clusters_cluster_id_upgrade_policies_post(
@@ -136,9 +124,7 @@ class Cluster:
                     wait_timeout=wait_timeout,
                 )
         except ApiException as ex:
-            LOGGER.error(
-                f"Fail to update upgrade policy {upgrade_policies_dict} on {ex.body}"
-            )
+            LOGGER.error(f"Fail to update upgrade policy {upgrade_policies_dict} on {ex.body}")
             raise
 
     def delete_upgrade_policy(self, upgrade_policy_id):
@@ -149,28 +135,17 @@ class Cluster:
                 upgrade_policy_id=upgrade_policy_id,
             )
         except ApiException as ex:
-            LOGGER.error(
-                f"Fail to delete upgrade policy {upgrade_policy_id} on {ex.body}"
-            )
+            LOGGER.error(f"Fail to delete upgrade policy {upgrade_policy_id} on {ex.body}")
             raise
 
     def get_upgrade_policy_id(self, upgrade_type="OSD"):
         LOGGER.info("Get upgrade policy id")
-        upgrade_policy = [
-            policy
-            for policy in self.upgrade_policies
-            if policy.upgrade_type == upgrade_type
-        ]
+        upgrade_policy = [policy for policy in self.upgrade_policies if policy.upgrade_type == upgrade_type]
         assert upgrade_policy, f"Could not find a policy of {upgrade_type} type"
         return upgrade_policy[0]
 
-    def wait_for_updated_upgrade_policy(
-        self, ocp_target_version, wait_timeout=TIMEOUT_10MIN
-    ):
-        LOGGER.info(
-            f"Wait for cluster {self.name} upgrade policy to be updated with"
-            f" {ocp_target_version} version."
-        )
+    def wait_for_updated_upgrade_policy(self, ocp_target_version, wait_timeout=TIMEOUT_10MIN):
+        LOGGER.info(f"Wait for cluster {self.name} upgrade policy to be updated with" f" {ocp_target_version} version.")
         samples = TimeoutSampler(
             wait_timeout=wait_timeout,
             sleep=1,
@@ -195,9 +170,7 @@ class Cluster:
             raise MissingResourceError(kind="Cluster", name=self.name)
 
         LOGGER.info(f"Delete cluster {self.name}.")
-        self.client.api_clusters_mgmt_v1_clusters_cluster_id_delete(
-            cluster_id=self.cluster_id, deprovision=deprovision
-        )
+        self.client.api_clusters_mgmt_v1_clusters_cluster_id_delete(cluster_id=self.cluster_id, deprovision=deprovision)
         if wait:
             self.wait_for_cluster_deletion(wait_timeout=timeout)
 
@@ -215,9 +188,7 @@ class Cluster:
             LOGGER.error(f"Timeout waiting for cluster {self.name} to be deleted")
             raise
 
-    def wait_for_cluster_ready(
-        self, wait_timeout=TIMEOUT_30MIN, stop_status=None, wait_for_osd_job=True
-    ):
+    def wait_for_cluster_ready(self, wait_timeout=TIMEOUT_30MIN, stop_status=None, wait_for_osd_job=True):
         stop_status = stop_status or "error"
         time_watcher = TimeoutWatch(timeout=wait_timeout)
 
@@ -240,18 +211,14 @@ class Cluster:
                     if current_status == "ready":
                         break
                     if current_status == stop_status:
-                        raise TimeoutExpiredError(
-                            f"Status of cluster {self.name} is {current_status}"
-                        )
+                        raise TimeoutExpiredError(f"Status of cluster {self.name} is {current_status}")
 
         except TimeoutExpiredError:
             LOGGER.error(f"Timeout waiting for cluster {self.name} to be ready")
             raise
 
         if wait_for_osd_job and not self.hypershift:
-            self.wait_for_osd_cluster_ready_job(
-                wait_timeout=time_watcher.remaining_time()
-            )
+            self.wait_for_osd_cluster_ready_job(wait_timeout=time_watcher.remaining_time())
 
         return self
 
@@ -281,12 +248,7 @@ class Cluster:
     @property
     @functools.cache
     def rosa(self):
-        return (
-            self.instance.get(AWS_OSD_STR, {})
-            .get("tags", {})
-            .get("red-hat-clustertype")
-            == "rosa"
-        )
+        return self.instance.get(AWS_OSD_STR, {}).get("tags", {}).get("red-hat-clustertype") == "rosa"
 
     @property
     @functools.cache
@@ -422,19 +384,17 @@ class Cluster:
             frame_values = inspect.getargvalues(frame)[3]
             required_attributes = ["region", "ocp_version"]
             if platform == AWS_OSD_STR:
-                required_attributes.extend([
-                    "aws_access_key_id",
-                    "aws_account_id",
-                    "aws_secret_access_key",
-                ])
+                required_attributes.extend(
+                    [
+                        "aws_access_key_id",
+                        "aws_account_id",
+                        "aws_secret_access_key",
+                    ]
+                )
 
             elif platform == GCP_OSD_STR:
                 required_attributes.append("gcp_service_account")
-            missing_attributes = [
-                attr_name
-                for attr_name in required_attributes
-                if not frame_values.get(attr_name)
-            ]
+            missing_attributes = [attr_name for attr_name in required_attributes if not frame_values.get(attr_name)]
 
             if missing_attributes:
                 raise ValueError(f"Missing attributes: {missing_attributes}")
@@ -509,13 +469,9 @@ class ClusterAddOn(Cluster):
         self.addon_version = self.addon_info()["version"]["id"]
 
     def addon_info(self):
-        return self.client.api_clusters_mgmt_v1_addons_addon_id_get(
-            self.addon_name
-        ).to_dict()
+        return self.client.api_clusters_mgmt_v1_addons_addon_id_get(self.addon_name).to_dict()
 
-    def validate_and_update_addon_parameters(
-        self, user_parameters=None, use_api_defaults=True
-    ):
+    def validate_and_update_addon_parameters(self, user_parameters=None, use_api_defaults=True):
         """
         Validate and update user input parameters against API's conditions and requirements.
 
@@ -561,14 +517,10 @@ class ClusterAddOn(Cluster):
                     default_value = param.get("default_value")
                     if conditions:
                         param_conditions = [
-                            condition["data"]
-                            for condition in conditions
-                            if condition["resource"] == "cluster"
+                            condition["data"] for condition in conditions if condition["resource"] == "cluster"
                         ]
                         if param_conditions:
-                            for condition, condition_value in param_conditions[
-                                0
-                            ].items():
+                            for condition, condition_value in param_conditions[0].items():
                                 if not self.check_param_conditions(
                                     clusters_dict=self.instance.to_dict(),
                                     condition=condition,
@@ -576,13 +528,9 @@ class ClusterAddOn(Cluster):
                                 ):
                                     break
                             else:
-                                _required_parameters[param_id] = {
-                                    "default_value": default_value
-                                }
+                                _required_parameters[param_id] = {"default_value": default_value}
                     else:
-                        _required_parameters[param_id] = {
-                            "default_value": default_value
-                        }
+                        _required_parameters[param_id] = {"default_value": default_value}
             return _required_parameters
 
         _user_parameters = user_parameters or []
@@ -591,31 +539,25 @@ class ClusterAddOn(Cluster):
         user_addon_parameters = [param["id"] for param in _user_parameters]
 
         if not addon_parameters and _user_parameters:
-            raise ValueError(
-                f"{self.addon_name} does not take any parameters, got"
-                f" {user_addon_parameters}"
-            )
+            raise ValueError(f"{self.addon_name} does not take any parameters, got" f" {user_addon_parameters}")
 
-        required_parameters = _get_required_cluster_parameters(
-            _addon_parameters=addon_parameters
-        )
+        required_parameters = _get_required_cluster_parameters(_addon_parameters=addon_parameters)
         missing_parameter = []
 
         for param, param_dict in required_parameters.items():
             if param not in user_addon_parameters:
                 if use_api_defaults and param_dict["default_value"]:
-                    _user_parameters.append({
-                        "id": param,
-                        "value": param_dict["default_value"],
-                    })
+                    _user_parameters.append(
+                        {
+                            "id": param,
+                            "value": param_dict["default_value"],
+                        }
+                    )
                 else:
                     missing_parameter.append(param)
 
         if missing_parameter:
-            raise ValueError(
-                f"{self.addon_name} missing some required parameters"
-                f" {missing_parameter}"
-            )
+            raise ValueError(f"{self.addon_name} missing some required parameters" f" {missing_parameter}")
         return _user_parameters
 
     def install_addon(
@@ -661,10 +603,7 @@ class ClusterAddOn(Cluster):
         parameters = self.validate_and_update_addon_parameters(
             user_parameters=parameters, use_api_defaults=use_api_defaults
         )
-        if (
-            self.addon_name == "managed-odh"
-            and "stage" in self.client.api_client.configuration.host
-        ):
+        if self.addon_name == "managed-odh" and "stage" in self.client.api_client.configuration.host:
             self.create_rhods_brew_config(brew_token=brew_token)
         LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
         if rosa:
@@ -674,39 +613,27 @@ class ClusterAddOn(Cluster):
 
             # TODO: remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
             command = (
-                f"install addon {self.addon_name} --cluster"
-                f" {self.name} {params_command} --billing-model standard"
+                f"install addon {self.addon_name} --cluster" f" {self.name} {params_command} --billing-model standard"
             )
 
             if self.addon_name == "managed-api-service":
                 # TODO: remove _wait_for_rhoam_installation after https://github.com/openshift/rosa/issues/970 resolved
                 res = _wait_for_rhoam_installation(_command=command)
             else:
-                res = rosa_cli.execute(
-                    command=command, ocm_client=self.client, aws_region=self.region
-                )
+                res = rosa_cli.execute(command=command, ocm_client=self.client, aws_region=self.region)
         else:
             if parameters:
                 _parameters = []
                 for params in parameters:
-                    _parameters.append(
-                        AddOnInstallationParameter(
-                            id=params["id"], value=params["value"]
-                        )
-                    )
+                    _parameters.append(AddOnInstallationParameter(id=params["id"], value=params["value"]))
 
                 _addon_installation_dict["parameters"] = {"items": _parameters}
             res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
                 cluster_id=self.cluster_id,
-                add_on_installation=AddOnInstallation(
-                    _check_type=False, **_addon_installation_dict
-                ),
+                add_on_installation=AddOnInstallation(_check_type=False, **_addon_installation_dict),
             )
 
-        if (
-            self.addon_name == "managed-api-service"
-            and "stage" in self.client.api_client.configuration.host
-        ):
+        if self.addon_name == "managed-api-service" and "stage" in self.client.api_client.configuration.host:
             # Create role-policy for RHOAM installation:
             # https://access.redhat.com/documentation/en-us/red_hat_openshift_api_management/1/guide/53dfb804-2038-4545-b917-2cb01a09ef98#_b5f80fce-73cb-4869-aa16-763bbe09896a:~:text=In%20the%20AWS%20CLI%2C%20create%20a%20policy%20for%20SRE%20Support.%20Enter%20the%20following%3A
             with open(
@@ -725,9 +652,7 @@ class ClusterAddOn(Cluster):
             self.update_rhoam_cluster_storage_config()
 
         if wait:
-            self.wait_for_install_state(
-                state=self.State.READY, wait_timeout=wait_timeout
-            )
+            self.wait_for_install_state(state=self.State.READY, wait_timeout=wait_timeout)
 
         LOGGER.info(f"{self.addon_name} v{self.addon_version} successfully installed")
         return res
@@ -744,19 +669,14 @@ class ClusterAddOn(Cluster):
     def wait_for_install_state(self, state, wait_timeout=TIMEOUT_30MIN):
         _state = None
         try:
-            for (
-                _addon_installation_instance
-            ) in self.addon_installation_instance_sampler(
+            for _addon_installation_instance in self.addon_installation_instance_sampler(
                 func=self.addon_installation_instance, wait_timeout=wait_timeout
             ):
                 _state = str(_addon_installation_instance.get("state"))
                 if _state == state:
                     return True
         except TimeoutExpiredError:
-            LOGGER.error(
-                f"Timeout waiting for {self.addon_name} state to be {state}, last state"
-                f" was {_state}"
-            )
+            LOGGER.error(f"Timeout waiting for {self.addon_name} state to be {state}, last state" f" was {_state}")
             raise
 
     def uninstall_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN, rosa=False):
@@ -784,9 +704,7 @@ class ClusterAddOn(Cluster):
                 addoninstallation_id=self.addon_name,
             )
         if wait:
-            for (
-                _addon_installation_instance
-            ) in self.addon_installation_instance_sampler(
+            for _addon_installation_instance in self.addon_installation_instance_sampler(
                 func=self.addon_installation_instance, wait_timeout=wait_timeout
             ):
                 if not _addon_installation_instance:
@@ -810,9 +728,7 @@ class ClusterAddOn(Cluster):
                     return rhmi_sample
 
         rhmi = _wait_for_rhmi_resource()
-        ResourceEditor(
-            patches={rhmi: {"spec": {"useClusterStorage": "false"}}}
-        ).update()
+        ResourceEditor(patches={rhmi: {"spec": {"useClusterStorage": "false"}}}).update()
 
     @staticmethod
     def create_rhods_brew_config(brew_token):
@@ -851,16 +767,11 @@ class ClusterAddOn(Cluster):
             Bool: True if cluster instance match with condition, else False
 
         """
-        cluster_condition_value = benedict(clusters_dict, keypath_separator=".").get(
-            condition
-        )
+        cluster_condition_value = benedict(clusters_dict, keypath_separator=".").get(condition)
         return (
-            isinstance(condition_value, list)
-            and cluster_condition_value in condition_value
+            isinstance(condition_value, list) and cluster_condition_value in condition_value
         ) or cluster_condition_value == condition_value
 
     @staticmethod
     def addon_installation_instance_sampler(func, wait_timeout=TIMEOUT_30MIN, **kwargs):
-        return TimeoutSampler(
-            wait_timeout=wait_timeout, sleep=SLEEP_1SEC, func=func, **kwargs
-        )
+        return TimeoutSampler(wait_timeout=wait_timeout, sleep=SLEEP_1SEC, func=func, **kwargs)
