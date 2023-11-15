@@ -794,13 +794,16 @@ class ClusterAddOn(Cluster):
         LOGGER.info(f"{self.addon_name} v{self.addon_version} was successfully removed")
         return res
 
-    @staticmethod
-    def update_rhoam_cluster_storage_config():
+    def update_rhoam_cluster_storage_config(self):
         def _wait_for_rhmi_resource():
             for rhmi_sample in TimeoutSampler(
                 wait_timeout=TIMEOUT_30MIN,
                 sleep=SLEEP_1SEC,
-                func=lambda: RHMI(name="rhoam", namespace="redhat-rhoam-operator"),
+                func=lambda: RHMI(
+                    client=self.ocp_client,
+                    name="rhoam",
+                    namespace="redhat-rhoam-operator",
+                ),
                 exceptions_dict={
                     NotImplementedError: [],
                     **NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -814,10 +817,9 @@ class ClusterAddOn(Cluster):
             patches={rhmi: {"spec": {"useClusterStorage": "false"}}}
         ).update()
 
-    @staticmethod
-    def create_rhods_brew_config(brew_token):
+    def create_rhods_brew_config(self, brew_token):
         icsp_name = "ocp-mgmt-wrapper-brew-registry"
-        icsp = ImageContentSourcePolicy(name=icsp_name)
+        icsp = ImageContentSourcePolicy(client=self.ocp_client, name=icsp_name)
         if icsp.exists:
             icsp.clean_up()
 
