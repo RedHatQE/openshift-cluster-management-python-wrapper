@@ -145,7 +145,7 @@ class Cluster:
         return upgrade_policy[0]
 
     def wait_for_updated_upgrade_policy(self, ocp_target_version, wait_timeout=TIMEOUT_10MIN):
-        LOGGER.info(f"Wait for cluster {self.name} upgrade policy to be updated with" f" {ocp_target_version} version.")
+        LOGGER.info(f"Wait for cluster {self.name} upgrade policy to be updated with {ocp_target_version} version.")
         samples = TimeoutSampler(
             wait_timeout=wait_timeout,
             sleep=1,
@@ -539,7 +539,7 @@ class ClusterAddOn(Cluster):
         user_addon_parameters = [param["id"] for param in _user_parameters]
 
         if not addon_parameters and _user_parameters:
-            raise ValueError(f"{self.addon_name} does not take any parameters, got" f" {user_addon_parameters}")
+            raise ValueError(f"{self.addon_name} does not take any parameters, got {user_addon_parameters}")
 
         required_parameters = _get_required_cluster_parameters(_addon_parameters=addon_parameters)
         missing_parameter = []
@@ -557,7 +557,7 @@ class ClusterAddOn(Cluster):
                     missing_parameter.append(param)
 
         if missing_parameter:
-            raise ValueError(f"{self.addon_name} missing some required parameters" f" {missing_parameter}")
+            raise ValueError(f"{self.addon_name} missing some required parameters {missing_parameter}")
         return _user_parameters
 
     def install_addon(
@@ -612,9 +612,7 @@ class ClusterAddOn(Cluster):
                 params_command += f" --{parameter['id']} {parameter['value']}"
 
             # TODO: remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
-            command = (
-                f"install addon {self.addon_name} --cluster" f" {self.name} {params_command} --billing-model standard"
-            )
+            command = f"install addon {self.addon_name} --cluster {self.name} {params_command} --billing-model standard"
 
             if self.addon_name == "managed-api-service":
                 # TODO: remove _wait_for_rhoam_installation after https://github.com/openshift/rosa/issues/970 resolved
@@ -676,7 +674,7 @@ class ClusterAddOn(Cluster):
                 if _state == state:
                     return True
         except TimeoutExpiredError:
-            LOGGER.error(f"Timeout waiting for {self.addon_name} state to be {state}, last state" f" was {_state}")
+            LOGGER.error(f"Timeout waiting for {self.addon_name} state to be {state}, last state was {_state}")
             raise
 
     def uninstall_addon(self, wait=True, wait_timeout=TIMEOUT_30MIN, rosa=False):
