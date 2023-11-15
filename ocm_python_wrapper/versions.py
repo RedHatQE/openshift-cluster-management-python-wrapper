@@ -28,8 +28,6 @@ class Versions:
 
         base_available_versions_dict = defaultdict(list)
         for version in versions_list.items:
-            base_available_versions_dict.setdefault(version.channel_group, []).append(
-                version.raw_id
-            )
+            base_available_versions_dict.setdefault(version.channel_group, []).append(version.raw_id)
 
         return base_available_versions_dict
