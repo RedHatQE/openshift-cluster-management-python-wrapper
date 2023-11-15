@@ -1,5 +1,6 @@
 [flake8]
-max-line-length = 120
+select=FCN,M511
+
 exclude =
     doc,
     .tox,
@@ -18,3 +19,7 @@ fcn_exclude_functions =
     fd,
     logging,
     subprocess,
+    yaml,
+    requests,
+    defaultdict,
+    inspect,

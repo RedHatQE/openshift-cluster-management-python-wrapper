@@ -9,7 +9,7 @@ from simple_logger.logger import get_logger
 
 from ocm_python_wrapper.exceptions import AuthenticationError, EndpointAccessError
 
-LOGGER = get_logger(__name__)
+LOGGER = get_logger(name=__name__)
 
 
 class OCMPythonClient(ApiClient):
@@ -66,17 +66,14 @@ class OCMPythonClient(ApiClient):
         # TODO: Check which exceptions are needed
         if response.status_code != 200:
             if response.status_code == 400:
-                if (
-                    response.json().get("error_description")
-                    == "Offline user session not found"
-                ):
-                    raise AuthenticationError(f"""OFFLINE Token Expired!
+                if response.json().get("error_description") == "Offline user session not found":
+                    raise AuthenticationError(
+                        f"""OFFLINE Token Expired!
                         Please update your config with a new token from: https://cloud.redhat.com/openshift/token\n"
-                        Error Code: {response.status_code}""")
+                        Error Code: {response.status_code}"""
+                    )
             else:
-                raise EndpointAccessError(
-                    err=response.status_code, endpoint=self.endpoint
-                )
+                raise EndpointAccessError(err=response.status_code, endpoint=self.endpoint)
 
         return response.json()["access_token"]
 
@@ -126,11 +123,7 @@ class OCMPythonClient(ApiClient):
             ValueError: If the API host is not found in the configuration.
         """
         api_hosts_config = Configuration().get_host_settings()
-        host_config = [
-            host["url"]
-            for host in api_hosts_config
-            if host["description"].lower() == api_host
-        ]
+        host_config = [host["url"] for host in api_hosts_config if host["description"].lower() == api_host]
         if host_config:
             return host_config[0]
         raise ValueError(f"Allowed configuration: {api_hosts_config}")
