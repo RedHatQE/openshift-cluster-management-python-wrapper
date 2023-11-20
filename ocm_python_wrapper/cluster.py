@@ -558,6 +558,8 @@ class ClusterAddOn(Cluster):
             addon_parameters_dict=addon_parameters_dict,
         )
 
+        LOGGER.info(f"Setting addon parameters to: {_user_parameters}")
+
         return _user_parameters
 
     @staticmethod
