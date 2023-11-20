@@ -546,7 +546,7 @@ class ClusterAddOn(Cluster):
             raise ValueError(f"{self.addon_name} does not take any parameters, got {user_addon_parameters}")
 
         addon_parameters_dict = self.get_cluster_parameters(_addon_parameters=addon_parameters)
-        _user_parameters = self.update_missing_params(
+        _user_parameters = self.update_missing_params_from_defaults(
             _user_parameters=_user_parameters,
             addon_parameters_dict=addon_parameters_dict,
             use_api_defaults=use_api_defaults,
@@ -570,7 +570,7 @@ class ClusterAddOn(Cluster):
 
         return _user_parameters
 
-    def update_missing_params(
+    def update_missing_params_from_defaults(
         self,
         _user_parameters,
         addon_parameters_dict,
