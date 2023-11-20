@@ -21,7 +21,7 @@ from ocp_resources.job import Job
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
-from ocp_utilities.infra import create_icsp, create_update_secret, get_client
+from ocp_utilities.infra import create_update_secret, get_client
 from simple_logger.logger import get_logger
 
 from ocm_python_wrapper.exceptions import MissingResourceError
@@ -710,13 +710,16 @@ class ClusterAddOn(Cluster):
         LOGGER.info(f"{self.addon_name} v{self.addon_version} was successfully removed")
         return res
 
-    @staticmethod
-    def update_rhoam_cluster_storage_config():
+    def update_rhoam_cluster_storage_config(self):
         def _wait_for_rhmi_resource():
             for rhmi_sample in TimeoutSampler(
                 wait_timeout=TIMEOUT_30MIN,
                 sleep=SLEEP_1SEC,
-                func=lambda: RHMI(name="rhoam", namespace="redhat-rhoam-operator"),
+                func=lambda: RHMI(
+                    client=self.ocp_client,
+                    name="rhoam",
+                    namespace="redhat-rhoam-operator",
+                ),
                 exceptions_dict={
                     NotImplementedError: [],
                     **NOT_FOUND_ERROR_EXCEPTION_DICT,
@@ -728,15 +731,11 @@ class ClusterAddOn(Cluster):
         rhmi = _wait_for_rhmi_resource()
         ResourceEditor(patches={rhmi: {"spec": {"useClusterStorage": "false"}}}).update()
 
-    @staticmethod
-    def create_rhods_brew_config(brew_token):
+    def create_rhods_brew_config(self, brew_token):
         icsp_name = "ocp-mgmt-wrapper-brew-registry"
-        icsp = ImageContentSourcePolicy(name=icsp_name)
-        if icsp.exists:
-            icsp.clean_up()
-
-        create_icsp(
-            icsp_name=icsp_name,
+        icsp = ImageContentSourcePolicy(
+            client=self.ocp_client,
+            name=icsp_name,
             repository_digest_mirrors=[
                 {
                     "source": "registry.redhat.io/rhods",
@@ -744,11 +743,16 @@ class ClusterAddOn(Cluster):
                 }
             ],
         )
+        if icsp.exists:
+            icsp.clean_up()
+        icsp.deploy(wait=True)
+
         secret_data_dict = {"auths": {"brew.registry.redhat.io": {"auth": brew_token}}}
         create_update_secret(
             secret_data_dict=secret_data_dict,
             name="pull-secret",  # pragma: allowlist secret
             namespace="openshift-config",
+            admin_client=self.ocp_client,
         )
 
     @staticmethod
