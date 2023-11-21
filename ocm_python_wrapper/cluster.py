@@ -472,7 +472,7 @@ class ClusterAddOn(Cluster):
         return self.client.api_clusters_mgmt_v1_addons_addon_id_get(self.addon_name).to_dict()
 
     def get_addon_parameters_dict(self, _addon_parameters):
-        """Filter related addon parameters if conditions are set
+        """Filter related addon parameters. Filter only related parameters if cluster condition(s) are set
 
         Args:
             _addon_parameters (dict) : Addons parameters from Clusters Management
@@ -481,11 +481,11 @@ class ClusterAddOn(Cluster):
         Returns:
             Dict of API addon parameters, including 'default_value' (if set), 'required' flag and 'value_type'
 
-        Example:
-            _addon_parameters = {
-                'cidr-range': {'default_value': '10.1.0.0/26', 'required': True, 'value_type': str},
-                'addon_parameter': {'default_value': '', 'required': False, 'value_type': bool},
-            }
+            Example:
+                _addon_parameters = {
+                    'cidr-range': {'default_value': '10.1.0.0/26', 'required': True, 'value_type': str},
+                    'addon_parameter': {'default_value': '', 'required': False, 'value_type': bool},
+                }
         """
         _addon_parameters_dict = {}
 
@@ -526,8 +526,7 @@ class ClusterAddOn(Cluster):
         """
 
         _user_parameters = user_parameters or []
-        _info = self.addon_info()
-        addon_parameters = _info.get("parameters", {})
+        addon_parameters = self.addon_info().get("parameters", {})
         user_addon_parameters = [param["id"] for param in _user_parameters]
 
         if not addon_parameters and _user_parameters:
@@ -568,11 +567,12 @@ class ClusterAddOn(Cluster):
         missing_parameter = []
         for param, param_dict in addon_parameters_dict.items():
             if param not in user_addon_parameters and param_dict["required"]:
-                if use_api_defaults and param_dict.get("default_value"):
+                default_value = param_dict["default_value"]
+                if use_api_defaults and default_value:
                     _user_parameters.append(
                         {
                             "id": param,
-                            "value": param_dict["default_value"],
+                            "value": default_value,
                         }
                     )
                 else:
