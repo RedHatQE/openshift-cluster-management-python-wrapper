@@ -471,11 +471,11 @@ class ClusterAddOn(Cluster):
     def addon_info(self):
         return self.client.api_clusters_mgmt_v1_addons_addon_id_get(self.addon_name).to_dict()
 
-    def get_addon_parameters_dict(self, _addon_parameters):
+    def get_addon_parameters_dict(self, addon_parameters):
         """Filter related addon parameters. Filter only related parameters if cluster condition(s) are set
 
         Args:
-            _addon_parameters (dict) : Addons parameters from Clusters Management
+            addon_parameters (dict) : Addons parameters from Clusters Management
                 cluster_mgmt_v1_addons_addon_id API.
 
         Returns:
@@ -489,7 +489,7 @@ class ClusterAddOn(Cluster):
         """
         _addon_parameters_dict = {}
 
-        for param in _addon_parameters.get("items"):
+        for param in addon_parameters.get("items"):
             if param_conditions := [
                 condition["data"] for condition in param.get("conditions", []) if condition["resource"] == "cluster"
             ]:
@@ -532,7 +532,7 @@ class ClusterAddOn(Cluster):
         if not addon_parameters and _user_parameters:
             raise ValueError(f"{self.addon_name} does not take any parameters, got {user_addon_parameters}")
 
-        addon_parameters_dict = self.get_addon_parameters_dict(_addon_parameters=addon_parameters)
+        addon_parameters_dict = self.get_addon_parameters_dict(addon_parameters=addon_parameters)
         _user_parameters = self.update_missing_params_from_defaults(
             _user_parameters=_user_parameters,
             addon_parameters_dict=addon_parameters_dict,
