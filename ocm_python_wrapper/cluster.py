@@ -471,6 +471,39 @@ class ClusterAddOn(Cluster):
     def addon_info(self):
         return self.client.api_clusters_mgmt_v1_addons_addon_id_get(self.addon_name).to_dict()
 
+    def get_addon_parameters_dict(self, addon_parameters):
+        """Filter related addon parameters. Filter only related parameters if cluster condition(s) are set
+
+        Args:
+            addon_parameters (dict) : Addons parameters from Clusters Management
+                cluster_mgmt_v1_addons_addon_id API.
+
+        Returns:
+            Dict of API addon parameters, including 'default_value' (if set), 'required' flag and 'value_type'
+
+            Example:
+                _addon_parameters = {
+                    'cidr-range': {'default_value': '10.1.0.0/26', 'required': True, 'value_type': str},
+                    'addon_parameter': {'default_value': '', 'required': False, 'value_type': bool},
+                }
+        """
+        _addon_parameters_dict = {}
+
+        for param in addon_parameters.get("items"):
+            if param_conditions := [
+                condition["data"] for condition in param.get("conditions", []) if condition["resource"] == "cluster"
+            ]:
+                if self.check_param_conditions(
+                    cluster_dict=self.instance.to_dict(),
+                    conditions_dict=param_conditions[0],
+                ):
+                    _addon_parameters_dict[param["id"]] = self._set_param_dict(_param=param)
+
+            else:
+                _addon_parameters_dict[param["id"]] = self._set_param_dict(_param=param)
+
+        return _addon_parameters_dict
+
     def validate_and_update_addon_parameters(self, user_parameters=None, use_api_defaults=True):
         """
         Validate and update user input parameters against API's conditions and requirements.
@@ -492,72 +525,61 @@ class ClusterAddOn(Cluster):
                 or when parameters are passed but not needed for addon.
         """
 
-        def _get_required_cluster_parameters(_addon_parameters):
-            """Filter cluster-related ``addon parameters``
-
-            Args:
-                _addon_parameters (dict) : Addons parameters from Clusters Management
-                    cluster_mgmt_v1_addons_addon_id API.
-
-            Returns:
-                Dict of required parameters which are relevant for the cluster's configuration
-
-            Example:
-                _required_parameters = {
-                    'cidr-range': {'default_value': '10.1.0.0/26'},
-                    'addon_parameter': {'default_value': ''}, ..
-                }
-            """
-            _required_parameters = {}
-
-            for param in _addon_parameters.get("items", []):
-                conditions = param.get("conditions")
-                if param.get("required"):
-                    param_id = param["id"]
-                    default_value = param.get("default_value")
-                    if conditions:
-                        param_conditions = [
-                            condition["data"] for condition in conditions if condition["resource"] == "cluster"
-                        ]
-                        if param_conditions:
-                            for condition, condition_value in param_conditions[0].items():
-                                if not self.check_param_conditions(
-                                    clusters_dict=self.instance.to_dict(),
-                                    condition=condition,
-                                    condition_value=condition_value,
-                                ):
-                                    break
-                            else:
-                                _required_parameters[param_id] = {"default_value": default_value}
-                    else:
-                        _required_parameters[param_id] = {"default_value": default_value}
-            return _required_parameters
-
         _user_parameters = user_parameters or []
-        _info = self.addon_info()
-        addon_parameters = _info.get("parameters", {})
+        addon_parameters = self.addon_info().get("parameters", {})
         user_addon_parameters = [param["id"] for param in _user_parameters]
 
         if not addon_parameters and _user_parameters:
             raise ValueError(f"{self.addon_name} does not take any parameters, got {user_addon_parameters}")
 
-        required_parameters = _get_required_cluster_parameters(_addon_parameters=addon_parameters)
-        missing_parameter = []
+        addon_parameters_dict = self.get_addon_parameters_dict(addon_parameters=addon_parameters)
+        _user_parameters = self.update_missing_params_from_defaults(
+            _user_parameters=_user_parameters,
+            addon_parameters_dict=addon_parameters_dict,
+            use_api_defaults=use_api_defaults,
+            user_addon_parameters=user_addon_parameters,
+        )
 
-        for param, param_dict in required_parameters.items():
-            if param not in user_addon_parameters:
-                if use_api_defaults and param_dict["default_value"]:
+        _user_parameters = self.update_param_value_type(
+            _user_parameters=_user_parameters,
+            addon_parameters_dict=addon_parameters_dict,
+        )
+
+        return _user_parameters
+
+    @staticmethod
+    def update_param_value_type(_user_parameters, addon_parameters_dict):
+        for param in _user_parameters:
+            param_type = addon_parameters_dict[param["id"]]["value_type"]
+            param_value = param["value"]
+            if not isinstance(param_value, param_type):
+                param["value"] = param_type(param_value)  # noqa: FCN001
+
+        return _user_parameters
+
+    def update_missing_params_from_defaults(
+        self,
+        _user_parameters,
+        addon_parameters_dict,
+        use_api_defaults,
+        user_addon_parameters,
+    ):
+        missing_parameter = []
+        for param, param_dict in addon_parameters_dict.items():
+            if param not in user_addon_parameters and param_dict["required"]:
+                default_value = param_dict["default_value"]
+                if use_api_defaults and default_value:
                     _user_parameters.append(
                         {
                             "id": param,
-                            "value": param_dict["default_value"],
+                            "value": default_value,
                         }
                     )
                 else:
                     missing_parameter.append(param)
-
         if missing_parameter:
             raise ValueError(f"{self.addon_name} missing some required parameters {missing_parameter}")
+
         return _user_parameters
 
     def install_addon(
@@ -756,24 +778,38 @@ class ClusterAddOn(Cluster):
         )
 
     @staticmethod
-    def check_param_conditions(clusters_dict, condition, condition_value):
+    def check_param_conditions(cluster_dict, conditions_dict):
         """
         Check if parameter conditions met with cluster configuration
 
         Args:
-            clusters_dict (dict): Cluster instance dict
-            condition (str): Condition key to check
-            condition_value (str): Condition expected value
+            cluster_dict (dict): Cluster instance dict
+            conditions_dict (dict): Parameter condition dict from API
 
         Returns:
-            Bool: True if cluster instance match with condition, else False
+            Bool: True if cluster instance match with conditions, else False
 
         """
-        cluster_condition_value = benedict(clusters_dict, keypath_separator=".").get(condition)
-        return (
-            isinstance(condition_value, list) and cluster_condition_value in condition_value
-        ) or cluster_condition_value == condition_value
+        match_all = []
+        for condition, condition_value in conditions_dict.items():
+            cluster_condition_value = benedict(cluster_dict, keypath_separator=".").get(condition)
+
+            match_all.append(
+                isinstance(condition_value, list)
+                and cluster_condition_value in condition_value
+                or cluster_condition_value == condition_value
+            )
+
+        return all(match_all)
 
     @staticmethod
     def addon_installation_instance_sampler(func, wait_timeout=TIMEOUT_30MIN, **kwargs):
         return TimeoutSampler(wait_timeout=wait_timeout, sleep=SLEEP_1SEC, func=func, **kwargs)
+
+    @staticmethod
+    def _set_param_dict(_param):
+        return {
+            "required": _param.get("required"),
+            "value_type": int if _param["value_type"] == "number" else str,
+            "default_value": _param.get("default_value"),
+        }
