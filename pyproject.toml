@@ -22,17 +22,16 @@ homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-wrap
 documentation = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/blob/main/README.md"
 keywords = ["Openshift", "OCM"]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
 ]
-packages = [{include = "ocm_python_wrapper"}]
+packages = [{ include = "ocm_python_wrapper" }]
 # Include ocm-python-wrapper package data:
-include = [{path = "manifests/*.json"}]
+include = [{ path = "manifests/*.json" }]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 colorlog = "^6.7.0"
-python-benedict = "^0.32.0"
 python-simple-logger = "^1.0.5"
 rosa-python-client = "^1.0.28"
 openshift-cluster-management-python-client = "^1.0.23"
@@ -42,6 +41,7 @@ pyyaml = "^6.0.1"
 openshift-python-utilities = "^5.0.0"
 importlib = "^1.0.4"
 redhat-qe-cloud-tools = "^1.0.10"
+python-benedict = "^0.33.0"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
