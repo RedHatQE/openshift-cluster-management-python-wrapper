@@ -41,7 +41,7 @@ pyyaml = "^6.0.1"
 openshift-python-utilities = "^5.0.0"
 importlib = "^1.0.4"
 redhat-qe-cloud-tools = "^1.0.10"
-python-benedict = "^0.33.0"
+python-benedict = "^0.32.0"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
