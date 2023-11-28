@@ -656,12 +656,12 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.8"
+version = "5.0.9"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_utilities-5.0.8.tar.gz", hash = "sha256:7d5fc3ed5f77fb879b6bb6a438becbcca0d7795493de6e28a5eb4531b9fe87ef"},
+    {file = "openshift_python_utilities-5.0.9.tar.gz", hash = "sha256:a2507552fcef4c6a14979bfa07e5fcac4cba0a0ec1dd56aaae38da50298a2c73"},
 ]
 
 [package.dependencies]
