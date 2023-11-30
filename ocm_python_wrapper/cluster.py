@@ -23,6 +23,7 @@ from ocp_resources.rhmi import RHMI
 from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 from ocp_utilities.infra import create_update_secret, get_client
 from simple_logger.logger import get_logger
+from ocp_utilities.must_gather import collect_must_gather
 
 from ocm_python_wrapper.exceptions import MissingResourceError
 
@@ -593,6 +594,8 @@ class ClusterAddOn(Cluster):
         brew_token=None,
         rosa=False,
         use_api_defaults=True,
+        must_gather_output_dir=None,
+        kubeconfig_path=None,
     ):
         """
         Install addon on the cluster
@@ -604,6 +607,8 @@ class ClusterAddOn(Cluster):
             brew_token (str): brew token for creating brew pull secret
             rosa (bool): Use ROSA cli if True else use OCM API
             use_api_defaults (bool): Use addon parameter default value if not provided.
+            must_gather_output_dir (str, optional): Path to base directory where must-gather logs will be stored
+            kubeconfig_path (str, optional): Path to kubeconfig
 
          Returns:
             AddOnInstallation or list: list of stdout responses if rosa is True, else AddOnInstallation
@@ -625,60 +630,74 @@ class ClusterAddOn(Cluster):
             "addon": addon,
         }
 
-        parameters = self.validate_and_update_addon_parameters(
-            user_parameters=parameters, use_api_defaults=use_api_defaults
-        )
-        if self.addon_name == "managed-odh" and "stage" in self.client.api_client.configuration.host:
-            self.create_rhods_brew_config(brew_token=brew_token)
-        LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
-        if rosa:
-            params_command = ""
-            for parameter in parameters:
-                params_command += f" --{parameter['id']} {parameter['value']}"
+        try:
+            parameters = self.validate_and_update_addon_parameters(
+                user_parameters=parameters, use_api_defaults=use_api_defaults
+            )
+            if self.addon_name == "managed-odh" and "stage" in self.client.api_client.configuration.host:
+                self.create_rhods_brew_config(brew_token=brew_token)
+            LOGGER.info(f"Installing addon {self.addon_name} v{self.addon_version}")
+            if rosa:
+                params_command = ""
+                for parameter in parameters:
+                    params_command += f" --{parameter['id']} {parameter['value']}"
 
-            # TODO: remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
-            command = f"install addon {self.addon_name} --cluster {self.name} {params_command} --billing-model standard"
+                # TODO: remove support for billing-model flag once https://github.com/openshift/rosa/issues/1279 resolved
+                command = (
+                    f"install addon {self.addon_name} --cluster {self.name} {params_command} --billing-model standard"
+                )
 
-            if self.addon_name == "managed-api-service":
-                # TODO: remove _wait_for_rhoam_installation after https://github.com/openshift/rosa/issues/970 resolved
-                res = _wait_for_rhoam_installation(_command=command)
+                if self.addon_name == "managed-api-service":
+                    # TODO: remove _wait_for_rhoam_installation after https://github.com/openshift/rosa/issues/970 resolved
+                    res = _wait_for_rhoam_installation(_command=command)
+                else:
+                    res = rosa_cli.execute(command=command, ocm_client=self.client, aws_region=self.region)
             else:
-                res = rosa_cli.execute(command=command, ocm_client=self.client, aws_region=self.region)
-        else:
-            if parameters:
-                _parameters = []
-                for params in parameters:
-                    _parameters.append(AddOnInstallationParameter(id=params["id"], value=params["value"]))
+                if parameters:
+                    _parameters = []
+                    for params in parameters:
+                        _parameters.append(AddOnInstallationParameter(id=params["id"], value=params["value"]))
 
-                _addon_installation_dict["parameters"] = {"items": _parameters}
-            res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
-                cluster_id=self.cluster_id,
-                add_on_installation=AddOnInstallation(_check_type=False, **_addon_installation_dict),
-            )
+                    _addon_installation_dict["parameters"] = {"items": _parameters}
+                res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
+                    cluster_id=self.cluster_id,
+                    add_on_installation=AddOnInstallation(_check_type=False, **_addon_installation_dict),
+                )
 
-        if self.addon_name == "managed-api-service" and "stage" in self.client.api_client.configuration.host:
-            # Create role-policy for RHOAM installation:
-            # https://access.redhat.com/documentation/en-us/red_hat_openshift_api_management/1/guide/53dfb804-2038-4545-b917-2cb01a09ef98#_b5f80fce-73cb-4869-aa16-763bbe09896a:~:text=In%20the%20AWS%20CLI%2C%20create%20a%20policy%20for%20SRE%20Support.%20Enter%20the%20following%3A
-            with open(
-                os.path.join(
-                    find_spec("ocm_python_wrapper").submodule_search_locations[0],
-                    "manifests/managed-api-service-policy.json",
-                ),
-                "r",
-            ) as fd:
-                policy_document = fd.read()
-            create_or_update_role_policy(
-                role_name="ManagedOpenShift-Support-Role",
-                policy_name="rhoam-sre-support-policy",
-                policy_document=policy_document,
-            )
-            self.update_rhoam_cluster_storage_config()
+            if self.addon_name == "managed-api-service" and "stage" in self.client.api_client.configuration.host:
+                # Create role-policy for RHOAM installation:
+                # https://access.redhat.com/documentation/en-us/red_hat_openshift_api_management/1/guide/53dfb804-2038-4545-b917-2cb01a09ef98#_b5f80fce-73cb-4869-aa16-763bbe09896a:~:text=In%20the%20AWS%20CLI%2C%20create%20a%20policy%20for%20SRE%20Support.%20Enter%20the%20following%3A
+                with open(
+                    os.path.join(
+                        find_spec("ocm_python_wrapper").submodule_search_locations[0],
+                        "manifests/managed-api-service-policy.json",
+                    ),
+                    "r",
+                ) as fd:
+                    policy_document = fd.read()
+                create_or_update_role_policy(
+                    role_name="ManagedOpenShift-Support-Role",
+                    policy_name="rhoam-sre-support-policy",
+                    policy_document=policy_document,
+                )
+                self.update_rhoam_cluster_storage_config()
 
-        if wait:
-            self.wait_for_install_state(state=self.State.READY, wait_timeout=wait_timeout)
+            if wait:
+                self.wait_for_install_state(state=self.State.READY, wait_timeout=wait_timeout)
 
-        LOGGER.info(f"{self.addon_name} v{self.addon_version} successfully installed")
-        return res
+            LOGGER.info(f"{self.addon_name} v{self.addon_version} successfully installed")
+            return res
+
+        except Exception as ex:
+            LOGGER.error(f"{self.addon_name} Install Failed. \n{ex}")
+            if must_gather_output_dir:
+                collect_must_gather(
+                    must_gather_output_dir=must_gather_output_dir,
+                    kubeconfig_path=kubeconfig_path,
+                    cluster_name=self.name,
+                    product_name=self.addon_name,
+                )
+            raise
 
     def addon_installation_instance(self):
         try:
