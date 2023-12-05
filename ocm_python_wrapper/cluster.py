@@ -199,8 +199,10 @@ class Cluster:
             LOGGER.error(f"Timeout waiting for cluster {self.name} to be exists")
             raise
 
+        cluster_status_str = "Status of cluster {name} is {current_status}"
         try:
             LOGGER.info(f"Wait for cluster {self.name} to be ready.")
+            cluster_status = None
             for sample in TimeoutSampler(
                 wait_timeout=time_watcher.remaining_time(),
                 sleep=SLEEP_1SEC,
@@ -210,8 +212,13 @@ class Cluster:
                     current_status = str(sample.state)
                     if current_status == "ready":
                         break
-                    if current_status == stop_status:
-                        raise TimeoutExpiredError(f"Status of cluster {self.name} is {current_status}")
+                    elif current_status != cluster_status:
+                        cluster_status = current_status
+                        LOGGER.info(cluster_status_str.format(name=self.name, current_status=current_status))
+                    elif current_status == stop_status:
+                        raise TimeoutExpiredError(
+                            cluster_status_str.format(name=self.name, current_status=current_status)
+                        )
 
         except TimeoutExpiredError:
             LOGGER.error(f"Timeout waiting for cluster {self.name} to be ready")
