@@ -391,13 +391,11 @@ class Cluster:
             frame_values = inspect.getargvalues(frame)[3]
             required_attributes = ["region", "ocp_version"]
             if platform == AWS_OSD_STR:
-                required_attributes.extend(
-                    [
-                        "aws_access_key_id",
-                        "aws_account_id",
-                        "aws_secret_access_key",
-                    ]
-                )
+                required_attributes.extend([
+                    "aws_access_key_id",
+                    "aws_account_id",
+                    "aws_secret_access_key",
+                ])
 
             elif platform == GCP_OSD_STR:
                 required_attributes.append("gcp_service_account")
@@ -576,12 +574,10 @@ class ClusterAddOn(Cluster):
             if param not in user_addon_parameters and param_dict["required"]:
                 default_value = param_dict["default_value"]
                 if use_api_defaults and default_value:
-                    _user_parameters.append(
-                        {
-                            "id": param,
-                            "value": default_value,
-                        }
-                    )
+                    _user_parameters.append({
+                        "id": param,
+                        "value": default_value,
+                    })
                 else:
                     missing_parameter.append(param)
         if missing_parameter:
