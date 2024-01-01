@@ -20,7 +20,7 @@ from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
 from ocp_resources.job import Job
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
-from ocp_resources.utils import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 from ocp_utilities.infra import create_update_secret, get_client
 from simple_logger.logger import get_logger
 from ocp_utilities.must_gather import collect_must_gather
