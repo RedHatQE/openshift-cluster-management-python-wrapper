@@ -1140,12 +1140,12 @@ files = [
 
 [[package]]
 name = "redhat-qe-cloud-tools"
-version = "1.0.23"
+version = "1.0.24"
 description = "Python utilities to manage cloud services, such as AWS."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "redhat_qe_cloud_tools-1.0.23.tar.gz", hash = "sha256:cc20889a76d04cba84b93db54449f40b1b818f8300cbb1018fbd2fef8e31ba0e"},
+    {file = "redhat_qe_cloud_tools-1.0.24.tar.gz", hash = "sha256:e66bb99e6ac20f20c1817bb851f926717004e71705a91fd49ede951d0e053424"},
 ]
 
 [package.dependencies]
