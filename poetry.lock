@@ -748,20 +748,20 @@ timeout-sampler = ">=0.0.1,<0.0.2"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "4.15.14"
+version = "4.15.18"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_wrapper-4.15.14.tar.gz", hash = "sha256:4c5e25cc64ae05e48afbea327d4ff8150fe4e07952df314821fb0fa01d017cf4"},
+    {file = "openshift_python_wrapper-4.15.18.tar.gz", hash = "sha256:2af6f6e42f36fe4b9136e895e4a631d56f3b710c616b6c0f887dc2eb9a9c46b8"},
 ]
 
 [package.dependencies]
 colorlog = ">=6.7.0,<7.0.0"
 jinja2 = ">=3.1.2,<4.0.0"
-kubernetes = ">=28.1.0b1,<29.0.0"
+kubernetes = ">=28.0.0,<29.0.0"
 packaging = ">=23.1,<24.0"
-python-benedict = ">=0.32.0,<0.33.0"
+python-benedict = ">=0.33.0,<0.34.0"
 python-simple-logger = ">=1.0.6,<2.0.0"
 xmltodict = ">=0.13.0,<0.14.0"
 
@@ -1003,13 +1003,13 @@ pyyaml = "*"
 
 [[package]]
 name = "python-benedict"
-version = "0.32.1"
+version = "0.33.1"
 description = "python-benedict is a dict subclass with keylist/keypath/keyattr support, normalized I/O operations (base64, csv, ini, json, pickle, plist, query-string, toml, xls, xml, yaml) and many utilities... for humans, obviously."
 optional = false
 python-versions = "*"
 files = [
-    {file = "python-benedict-0.32.1.tar.gz", hash = "sha256:d669cbd0ca4e6cd9fbdc10b8f68ae57ac3224b49f7f55e9b2c13622c0434a148"},
-    {file = "python_benedict-0.32.1-py3-none-any.whl", hash = "sha256:61272f128ea5046399d261047b33d53e0836c951d9697b23a02d0723f9322e1d"},
+    {file = "python-benedict-0.33.1.tar.gz", hash = "sha256:e65ecfc16b505b0fefa08ed97c65f6f93cf32c0309dd2e1614fc0f58f22b2c4e"},
+    {file = "python_benedict-0.33.1-py3-none-any.whl", hash = "sha256:8838ebe33ed7508d37472346e67516fcf525ebc717a6f48b37aa00e0b89bc463"},
 ]
 
 [package.dependencies]
@@ -1019,8 +1019,9 @@ requests = ">=2.26.0,<3.0.0"
 
 [package.extras]
 all = ["python-benedict[io,parse,s3]"]
-io = ["python-benedict[toml,xls,xml,yaml]"]
-parse = ["ftfy (>=6.0.0,<7.0.0)", "mailchecker (>=4.1.0,<6.0.0)", "phonenumbers (>=8.12.0,<9.0.0)", "python-dateutil (>=2.8.0,<3.0.0)"]
+html = ["beautifulsoup4 (>=4.12.0,<5.0.0)", "python-benedict[xml]"]
+io = ["python-benedict[html,toml,xls,xml,yaml]"]
+parse = ["ftfy (>=6.0.0,<7.0.0)", "mailchecker (>=4.1.0,<7.0.0)", "phonenumbers (>=8.12.0,<9.0.0)", "python-dateutil (>=2.8.0,<3.0.0)"]
 s3 = ["boto3 (>=1.24.89,<2.0.0)"]
 toml = ["toml (>=0.10.2,<1.0.0)"]
 xls = ["openpyxl (>=3.0.0,<4.0.0)", "xlrd (>=2.0.0,<3.0.0)"]
@@ -1201,18 +1202,18 @@ rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
 name = "rosa-python-client"
-version = "1.0.39"
+version = "1.0.44"
 description = "Wrapper for rosa cli"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "rosa_python_client-1.0.39.tar.gz", hash = "sha256:e9cf96a70168e010de5f20ca03a0619ec1fe65f8b689bbf189185497c8a6a6ce"},
+    {file = "rosa_python_client-1.0.44.tar.gz", hash = "sha256:e309ee4c7ff92d7afbf85d4680e5dccc7b7a6945198a34cd93eba930427c4b97"},
 ]
 
 [package.dependencies]
-python-benedict = ">=0.32.0,<0.33.0"
+python-benedict = ">=0.33.0,<0.34.0"
 python-simple-logger = ">=1.0.5,<2.0.0"
-redhat-qe-cloud-tools = ">=1.0.6,<2.0.0"
+redhat-qe-cloud-tools = "*"
 
 [[package]]
 name = "rsa"
@@ -1393,4 +1394,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "4ec000b5693f45bbdcff80f5ac55a80bf50480d498a7588a49a14fcf85993148"
+content-hash = "a55d140b70dac27ec98ac29cf51ce47a796b109c0b8d3c62997c67c9c2680e2a"
