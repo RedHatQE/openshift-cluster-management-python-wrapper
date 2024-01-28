@@ -729,19 +729,17 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.17"
+version = "5.0.20"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_utilities-5.0.17.tar.gz", hash = "sha256:228ba82f5bdce096564ad9dff605b680875409ae66570656517c0f07af5ea1a1"},
+    {file = "openshift_python_utilities-5.0.20.tar.gz", hash = "sha256:b8e5da341b7503287e4f7eaf01981ec37913ce70709775e9bce34d6c5fde6654"},
 ]
 
 [package.dependencies]
 colorlog = ">=6.7.0,<7.0.0"
 openshift-python-wrapper-data-collector = ">=1.0.4,<2.0.0"
-pytest = ">=7.4.0,<8.0.0"
-pytest-testconfig = ">=0.2.0,<0.3.0"
 python-simple-logger = ">=1.0.5,<2.0.0"
 pyyaml = ">=6.0.1,<7.0.0"
 timeout-sampler = ">=0.0.1,<0.0.2"
