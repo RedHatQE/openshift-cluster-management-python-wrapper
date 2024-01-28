@@ -729,29 +729,30 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.20"
+version = "5.0.11"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_utilities-5.0.20.tar.gz", hash = "sha256:b8e5da341b7503287e4f7eaf01981ec37913ce70709775e9bce34d6c5fde6654"},
+    {file = "openshift_python_utilities-5.0.11.tar.gz", hash = "sha256:7494fd7b7cd545fdc52291c914a139df0d18e86f35ff8e75c8d4d052275caa1a"},
 ]
 
 [package.dependencies]
 colorlog = ">=6.7.0,<7.0.0"
 openshift-python-wrapper-data-collector = ">=1.0.4,<2.0.0"
+pytest = ">=7.4.0,<8.0.0"
+pytest-testconfig = ">=0.2.0,<0.3.0"
 python-simple-logger = ">=1.0.5,<2.0.0"
 pyyaml = ">=6.0.1,<7.0.0"
-timeout-sampler = ">=0.0.1,<0.0.2"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "10.0.2"
+version = "10.0.3"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_wrapper-10.0.2.tar.gz", hash = "sha256:e0258c5ac4d81824c3f7d881025d1c9f4dcedd068cd3ed4bd35b889d153c1e88"},
+    {file = "openshift_python_wrapper-10.0.3.tar.gz", hash = "sha256:2ced7ea4ab55cfec2ed3613dce10c056aaa760f1a97ca51ca00a320250a8ef71"},
 ]
 
 [package.dependencies]
@@ -761,7 +762,7 @@ kubernetes = ">=29.0.0,<30.0.0"
 packaging = ">=23.1,<24.0"
 python-benedict = ">=0.33.0,<0.34.0"
 python-simple-logger = ">=1.0.6,<2.0.0"
-timeout-sampler = ">=0.0.1,<0.0.2"
+timeout-sampler = ">=0.0.2,<0.0.3"
 xmltodict = ">=0.13.0,<0.14.0"
 
 [[package]]
@@ -1289,12 +1290,12 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.1"
+version = "0.0.2"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "timeout_sampler-0.0.1.tar.gz", hash = "sha256:e148f6e04a19b64f36209bbf3a7f8eb44ce6d9746edc09923fa8ea9dc6a110e9"},
+    {file = "timeout_sampler-0.0.2.tar.gz", hash = "sha256:addd9799f49dc1a9d7b053a63624d5f7438b09626e4a614295095431f7c66426"},
 ]
 
 [package.dependencies]
@@ -1394,4 +1395,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "89ef60d9a3c3071f5a002f26f9b23a5a1c1c717ceb9cb994d59bb5ca5f5a6749"
+content-hash = "e59a3e09ec3c08266c78f4eba5d2e9484a76b73900fab561e7ed2686d6c54a6e"

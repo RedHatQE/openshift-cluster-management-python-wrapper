@@ -41,7 +41,7 @@ pyyaml = "^6.0.1"
 openshift-python-utilities = "^5.0.0"
 importlib = "^1.0.4"
 redhat-qe-cloud-tools = "^1.0.10"
-timeout-sampler = "^0.0.1"
+timeout-sampler = "^0.0.2"
 python-benedict = "0.33.1"
 
 [tool.poetry.group.dev.dependencies]
