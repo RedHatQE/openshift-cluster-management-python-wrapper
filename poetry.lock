@@ -1203,18 +1203,18 @@ rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
 name = "rosa-python-client"
-version = "1.0.46"
+version = "1.0.47"
 description = "Wrapper for rosa cli"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "rosa_python_client-1.0.46.tar.gz", hash = "sha256:8c7a9efca0bbcd5d9dd1f50b490137efa7c732dfdec6405edfa511962d993e10"},
+    {file = "rosa_python_client-1.0.47.tar.gz", hash = "sha256:58de9bc3856b96272a0b79cb94cba10898afe724a73b09d2f89ccf0b751bda9b"},
 ]
 
 [package.dependencies]
 python-benedict = ">=0.33.0,<0.34.0"
-python-simple-logger = ">=1.0.5,<2.0.0"
-redhat-qe-cloud-tools = "*"
+python-simple-logger = ">=1.0.5"
+redhat-qe-cloud-tools = ">=1.0.19"
 
 [[package]]
 name = "rsa"
