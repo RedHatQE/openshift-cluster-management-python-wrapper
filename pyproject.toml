@@ -32,16 +32,16 @@ include = [{ path = "manifests/*.json" }]
 [tool.poetry.dependencies]
 python = "^3.8"
 colorlog = "^6.7.0"
-python-simple-logger = "^1.0.5"
-rosa-python-client = "^1.0.28"
-openshift-cluster-management-python-client = "^1.0.23"
-openshift-python-wrapper = "^10.0.0"
+python-simple-logger = ">=1.0.5"
+rosa-python-client = ">=1.0.28"
+openshift-cluster-management-python-client = ">=1.0.23"
+openshift-python-wrapper = ">=10.0.0"
 requests = "^2.31.0"
 pyyaml = "^6.0.1"
-openshift-python-utilities = "^5.0.0"
+openshift-python-utilities = ">=5.0.0"
 importlib = "^1.0.4"
-redhat-qe-cloud-tools = "^1.0.10"
-timeout-sampler = "^0.0.2"
+redhat-qe-cloud-tools = ">=1.0.10"
+timeout-sampler = ">=0.0.2"
 python-benedict = "0.33.1"
 
 [tool.poetry.group.dev.dependencies]
