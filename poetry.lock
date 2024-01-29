@@ -1290,16 +1290,16 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.2"
+version = "0.0.3"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "timeout_sampler-0.0.2.tar.gz", hash = "sha256:addd9799f49dc1a9d7b053a63624d5f7438b09626e4a614295095431f7c66426"},
+    {file = "timeout_sampler-0.0.3.tar.gz", hash = "sha256:16b529ec86dfc8980f19d95ee440190e8993749d75960beb4d2190247020056a"},
 ]
 
 [package.dependencies]
-python-simple-logger = ">=1.0.8,<2.0.0"
+python-simple-logger = ">=1.0.8"
 
 [[package]]
 name = "tomli"
