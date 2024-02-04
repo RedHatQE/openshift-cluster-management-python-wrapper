@@ -774,6 +774,7 @@ class ClusterAddOn(Cluster):
 
         rhmi = _wait_for_rhmi_resource()
         ResourceEditor(patches={rhmi: {"spec": {"useClusterStorage": "false"}}}).update()
+        rhmi.wait_for_status_complete(timeout=TIMEOUT_30MIN)
 
     def create_rhods_brew_config(self, brew_token):
         icsp_name = "ocp-mgmt-wrapper-brew-registry"
