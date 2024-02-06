@@ -31,6 +31,7 @@ LOGGER = get_logger(name=__name__)
 TIMEOUT_5MIN = 5 * 60
 TIMEOUT_10MIN = 10 * 60
 TIMEOUT_30MIN = 30 * 60
+TIMEOUT_45MIN = 45 * 60
 TIMEOUT_60MIN = 60 * 60
 SLEEP_1SEC = 1
 AWS_OSD_STR = "aws"
@@ -774,7 +775,7 @@ class ClusterAddOn(Cluster):
 
         rhmi = _wait_for_rhmi_resource()
         ResourceEditor(patches={rhmi: {"spec": {"useClusterStorage": "false"}}}).update()
-        rhmi.wait_for_status_complete(timeout=TIMEOUT_30MIN)
+        rhmi.wait_for_stage_status_complete(timeout=TIMEOUT_45MIN)
 
     def create_rhods_brew_config(self, brew_token):
         icsp_name = "ocp-mgmt-wrapper-brew-registry"
