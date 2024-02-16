@@ -748,12 +748,12 @@ timeout-sampler = ">=0.0.1"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "10.0.11"
+version = "10.0.12"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_wrapper-10.0.11.tar.gz", hash = "sha256:31a3df30a25a91a4a3ce738dc528a0918259ca30a91e91b1f3bb4c1584e46241"},
+    {file = "openshift_python_wrapper-10.0.12.tar.gz", hash = "sha256:796c3821144c3fd915c90f8483cf03aa07c0f692290f17311e0d6db9d9e0cfc7"},
 ]
 
 [package.dependencies]
