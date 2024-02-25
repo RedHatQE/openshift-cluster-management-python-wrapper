@@ -1228,12 +1228,12 @@ rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
 name = "rosa-python-client"
-version = "1.0.55"
+version = "1.0.56"
 description = "Wrapper for rosa cli"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "rosa_python_client-1.0.55.tar.gz", hash = "sha256:8b75141e71d0a35fd1d23439305c82b4698ad8f0b9808bfae26b37505d1480cc"},
+    {file = "rosa_python_client-1.0.56.tar.gz", hash = "sha256:1a312f87dc8af3963e1fe15c8b2e357c195830143f0faca9b1f5f53776ccea6e"},
 ]
 
 [package.dependencies]
