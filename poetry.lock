@@ -40,6 +40,27 @@ files = [
 ]
 
 [[package]]
+name = "beautifulsoup4"
+version = "4.12.3"
+description = "Screen-scraping library"
+optional = false
+python-versions = ">=3.6.0"
+files = [
+    {file = "beautifulsoup4-4.12.3-py3-none-any.whl", hash = "sha256:b80878c9f40111313e55da8ba20bdba06d8fa3969fc68304167741bbf9e082ed"},
+    {file = "beautifulsoup4-4.12.3.tar.gz", hash = "sha256:74e3d1928edc070d21748185c46e3fb33490f22f52a3addee9aee0f4f7781051"},
+]
+
+[package.dependencies]
+soupsieve = ">1.2"
+
+[package.extras]
+cchardet = ["cchardet"]
+chardet = ["chardet"]
+charset-normalizer = ["charset-normalizer"]
+html5lib = ["html5lib"]
+lxml = ["lxml"]
+
+[[package]]
 name = "boto3"
 version = "1.34.19"
 description = "The AWS SDK for Python"
@@ -729,31 +750,34 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.26"
+version = "5.0.27"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_utilities-5.0.26.tar.gz", hash = "sha256:6e693cd1493d33ed07bd428af4fa4d15ecba904c4dd7903ad7fb885fc85f0302"},
+    {file = "openshift_python_utilities-5.0.27.tar.gz", hash = "sha256:a7fc4aeb48962ca7117fbdee59d22dbb917808be355bf863f7208378478b920b"},
 ]
 
 [package.dependencies]
+beautifulsoup4 = ">=4.12.3,<5.0.0"
 colorlog = ">=6.7.0,<7.0.0"
 openshift-python-wrapper = ">=10.0.4"
 openshift-python-wrapper-data-collector = ">=1.0.4"
 pytest = ">=8.0.0,<9.0.0"
 python-simple-logger = ">=1.0.5"
 pyyaml = ">=6.0.1,<7.0.0"
+requests = ">=2.31.0,<3.0.0"
+semver = ">=3.0.2,<4.0.0"
 timeout-sampler = ">=0.0.1"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "10.0.10"
+version = "10.0.18"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "openshift_python_wrapper-10.0.10.tar.gz", hash = "sha256:59d2e46819d3a7634f465ce9cdbeffc4a67954a84165050abc2a799fb28d2951"},
+    {file = "openshift_python_wrapper-10.0.18.tar.gz", hash = "sha256:00549fc2a216fc8bdd4410e750eb5ebb903b789805e75c36d46fbb38b7c354bd"},
 ]
 
 [package.dependencies]
@@ -1004,13 +1028,13 @@ pyyaml = "*"
 
 [[package]]
 name = "python-benedict"
-version = "0.33.1"
+version = "0.33.2"
 description = "python-benedict is a dict subclass with keylist/keypath/keyattr support, normalized I/O operations (base64, csv, ini, json, pickle, plist, query-string, toml, xls, xml, yaml) and many utilities... for humans, obviously."
 optional = false
 python-versions = "*"
 files = [
-    {file = "python-benedict-0.33.1.tar.gz", hash = "sha256:e65ecfc16b505b0fefa08ed97c65f6f93cf32c0309dd2e1614fc0f58f22b2c4e"},
-    {file = "python_benedict-0.33.1-py3-none-any.whl", hash = "sha256:8838ebe33ed7508d37472346e67516fcf525ebc717a6f48b37aa00e0b89bc463"},
+    {file = "python-benedict-0.33.2.tar.gz", hash = "sha256:662de43bffb4e127da2056447f8ddd7f6f5c89b72dd66d289cf9abd1cc2720c8"},
+    {file = "python_benedict-0.33.2-py3-none-any.whl", hash = "sha256:50a69b601b34d4ad7b67fe94e3266ec05046bc547a4132fe43fd8fbd41aeefaa"},
 ]
 
 [package.dependencies]
@@ -1056,12 +1080,12 @@ files = [
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.10"
+version = "1.0.14"
 description = "A simple logger for python"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "python_simple_logger-1.0.10.tar.gz", hash = "sha256:4be72da23dc35b030f82e79d2093b6f1c659fae6c3b2120a03b1c92077fde8a9"},
+    {file = "python_simple_logger-1.0.14.tar.gz", hash = "sha256:039c258ac409876897fe03f3c36a451b92dfabd2e6a8279f9cf925f63fb6b773"},
 ]
 
 [package.dependencies]
@@ -1146,12 +1170,12 @@ files = [
 
 [[package]]
 name = "redhat-qe-cloud-tools"
-version = "1.0.38"
+version = "1.0.46"
 description = "Python utilities to manage cloud services, such as AWS."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "redhat_qe_cloud_tools-1.0.38.tar.gz", hash = "sha256:6512abf012b16d96644910db32930bc7910e85c7748826586ad108f6187499b2"},
+    {file = "redhat_qe_cloud_tools-1.0.46.tar.gz", hash = "sha256:b9753f66a399ad9e9ae9a07c23cd366c2053f1ff78c0733db0646f7f0d86d831"},
 ]
 
 [package.dependencies]
@@ -1204,12 +1228,12 @@ rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
 name = "rosa-python-client"
-version = "1.0.52"
+version = "1.0.61"
 description = "Wrapper for rosa cli"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "rosa_python_client-1.0.52.tar.gz", hash = "sha256:06455843a614cb9b51f9329ad953f0b0298814c065330440fbe3c373a3716b06"},
+    {file = "rosa_python_client-1.0.61.tar.gz", hash = "sha256:c226f26865a208bfe08076ae38f476751541ef68c58d897294fd9640c2cf421b"},
 ]
 
 [package.dependencies]
@@ -1249,6 +1273,17 @@ botocore = ">=1.33.2,<2.0a.0"
 crt = ["botocore[crt] (>=1.33.2,<2.0a.0)"]
 
 [[package]]
+name = "semver"
+version = "3.0.2"
+description = "Python helper for Semantic Versioning (https://semver.org)"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "semver-3.0.2-py3-none-any.whl", hash = "sha256:b1ea4686fe70b981f85359eda33199d60c53964284e0cfb4977d243e37cf4bf4"},
+    {file = "semver-3.0.2.tar.gz", hash = "sha256:6253adb39c70f6e51afed2fa7152bcd414c411286088fb4b9effb133885ab4cc"},
+]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1257,6 +1292,17 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 files = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
+]
+
+[[package]]
+name = "soupsieve"
+version = "2.5"
+description = "A modern CSS selector implementation for Beautiful Soup."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "soupsieve-2.5-py3-none-any.whl", hash = "sha256:eaa337ff55a1579b6549dc679565eac1e3d000563bcb1c8ab0d0fefbc0c2cdc7"},
+    {file = "soupsieve-2.5.tar.gz", hash = "sha256:5663d5a7b3bfaeee0bc4372e7fc48f9cff4940b3eec54a6451cc5299f1097690"},
 ]
 
 [[package]]
@@ -1291,12 +1337,12 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.6"
+version = "0.0.13"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "timeout_sampler-0.0.6.tar.gz", hash = "sha256:96159c7dbc758ede62033eac1cd3d29d1aec1e7113766604b10c6ed1f0184ada"},
+    {file = "timeout_sampler-0.0.13.tar.gz", hash = "sha256:30ac6f1c7d42eefb91e8ee1ed188bddc54ab53c42dfbddc490caf306573796c1"},
 ]
 
 [package.dependencies]
@@ -1396,4 +1442,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "177cf7275f03cab9e91496b317a0a4cf7a31810f7a27a69e49c22ee358dd7b90"
+content-hash = "23175b1521dddd2e44027d38cbe77a4c361c2fcb452b4dd8798e39ab669c82c3"
