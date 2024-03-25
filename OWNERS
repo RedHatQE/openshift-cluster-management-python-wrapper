@@ -1,9 +1,10 @@
 approvers:
-  - myakove
   - rnetser
+  - myakove
 reviewers:
-  - myakove
   - rnetser
-  - oharan2
-  - shakyav
   - omrirh
+  - ILpinto
+  - myakove
+  - chetna14manku
+  - rujutashinde
