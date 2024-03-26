@@ -772,12 +772,12 @@ timeout-sampler = ">=0.0.17"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "10.0.24"
+version = "10.0.25"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_wrapper-10.0.24.tar.gz", hash = "sha256:24bcabc632a1cf2375be8022dd77a7b123fcc6ff8ff823578f3dfdceddaafa9c"},
+    {file = "openshift_python_wrapper-10.0.25.tar.gz", hash = "sha256:800bd30356305a734549da63c57f4080ad619565c4f4b1bf88bc208689ad80e6"},
 ]
 
 [package.dependencies]
@@ -1170,12 +1170,12 @@ files = [
 
 [[package]]
 name = "redhat-qe-cloud-tools"
-version = "1.0.53"
+version = "1.0.54"
 description = "Python utilities to manage cloud services, such as AWS."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "redhat_qe_cloud_tools-1.0.53.tar.gz", hash = "sha256:c9bfc03d19e1a77fdd886953a3ca50ed8b7141b85264db6171cb33d2f3b896b5"},
+    {file = "redhat_qe_cloud_tools-1.0.54.tar.gz", hash = "sha256:ac01ca0275f484fcf04875e1cbcf44fde4e3bff11adbe8054f8cfdce65dc8f69"},
 ]
 
 [package.dependencies]
@@ -1337,12 +1337,12 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.19"
+version = "0.0.20"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "timeout_sampler-0.0.19.tar.gz", hash = "sha256:48513d8af24bb9ac9865b06c474bfd9c6c843a047448f246185abe68fc7e6663"},
+    {file = "timeout_sampler-0.0.20.tar.gz", hash = "sha256:76aa596fb812e17eff991bcd5b39a441dd0bc3d101fd57da2a407f38c2131e6d"},
 ]
 
 [package.dependencies]
