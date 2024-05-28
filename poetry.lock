@@ -1155,12 +1155,12 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.47"
+version = "5.0.49"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_utilities-5.0.47.tar.gz", hash = "sha256:24fa1012cf49d0ea7e8cbfe2b4131a728207ccc9e88fc5d9d45e250db2c527a2"},
+    {file = "openshift_python_utilities-5.0.49.tar.gz", hash = "sha256:5d39c55ba7e02b5ada2b62019926003bffc29bca511f35264133e8f29d4b2c49"},
 ]
 
 [package.dependencies]
@@ -1168,7 +1168,7 @@ beautifulsoup4 = ">=4.12.3,<5.0.0"
 colorlog = ">=6.7.0,<7.0.0"
 openshift-python-wrapper = ">=10.0.4"
 openshift-python-wrapper-data-collector = ">=1.0.4"
-pyhelper-utils = ">=0.0.21,<0.0.22"
+pyhelper-utils = ">=0.0.22,<0.0.23"
 python-simple-logger = ">=1.0.5"
 pyyaml = ">=6.0.1,<7.0.0"
 requests = ">=2.31.0,<3.0.0"
@@ -1458,12 +1458,12 @@ plugins = ["importlib-metadata"]
 
 [[package]]
 name = "pyhelper-utils"
-version = "0.0.21"
+version = "0.0.22"
 description = "Collective utility functions for python projects"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pyhelper_utils-0.0.21.tar.gz", hash = "sha256:4a8a0dbcbb4145851c43d28953e6dc6b51644bd72b2411c343fbf6fe40ae9e0b"},
+    {file = "pyhelper_utils-0.0.22.tar.gz", hash = "sha256:9706d61ed25bb273277285c062b165be65824f76e543084ff0a3af6217166d28"},
 ]
 
 [package.dependencies]
@@ -1739,12 +1739,12 @@ files = [
 
 [[package]]
 name = "redhat-qe-cloud-tools"
-version = "1.0.80"
+version = "1.0.81"
 description = "Python utilities to manage cloud services, such as AWS."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "redhat_qe_cloud_tools-1.0.80.tar.gz", hash = "sha256:4cf5205423510041a62ca23e7ac69149fdda0772ef2e76416ec63e571d9d03bb"},
+    {file = "redhat_qe_cloud_tools-1.0.81.tar.gz", hash = "sha256:f6775925f84d131bc8a1216ecee80cc8f3b3c322d663fbc94bda8c3f7c883f9b"},
 ]
 
 [package.dependencies]
@@ -1759,8 +1759,8 @@ click = ">=8.1.4,<9.0.0"
 colorlog = ">=6.7.0,<7.0.0"
 configparser = ">=7.0.0,<8.0.0"
 google-cloud-compute = ">=1.14.1,<2.0.0"
-openshift-python-utilities = ">=5.0.46,<6.0.0"
-pyhelper-utils = ">=0.0.21,<0.0.22"
+openshift-python-utilities = ">=5.0.49,<6.0.0"
+pyhelper-utils = ">=0.0.22,<0.0.23"
 python-simple-logger = ">=1.0.5"
 
 [[package]]
