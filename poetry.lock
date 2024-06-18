@@ -1169,12 +1169,12 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.54"
+version = "5.0.55"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_utilities-5.0.54.tar.gz", hash = "sha256:bea383c5d3c6903f29bd5ea636bf14a4668fe599835926e59ad89743c252231f"},
+    {file = "openshift_python_utilities-5.0.55.tar.gz", hash = "sha256:4937adbe8798431cd8e2a26a24089997e1ee2064e4e3d2665193fb67bfa707d7"},
 ]
 
 [package.dependencies]
@@ -1192,12 +1192,12 @@ timeout-sampler = ">=0.0.17"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "10.0.59"
+version = "10.0.60"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_wrapper-10.0.59.tar.gz", hash = "sha256:931d2154ec9fdac6c7675771e5ddfacb68687a16a516cfb31cd64654d4f75a7e"},
+    {file = "openshift_python_wrapper-10.0.60.tar.gz", hash = "sha256:9fa33c60f4f076bcb9aeb6b7bd35add75f7f295eea85e9e2f8d510ab26ecfed7"},
 ]
 
 [package.dependencies]
