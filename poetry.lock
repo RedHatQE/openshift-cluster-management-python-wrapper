@@ -1169,12 +1169,12 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.55"
+version = "5.0.56"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_utilities-5.0.55.tar.gz", hash = "sha256:4937adbe8798431cd8e2a26a24089997e1ee2064e4e3d2665193fb67bfa707d7"},
+    {file = "openshift_python_utilities-5.0.56.tar.gz", hash = "sha256:5bb975e13c6239bc0f286fa93d537b1fd439b7b53d7ea2440e1f92b849e6b884"},
 ]
 
 [package.dependencies]
@@ -1192,12 +1192,12 @@ timeout-sampler = ">=0.0.17"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "10.0.64"
+version = "10.0.65"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_wrapper-10.0.64.tar.gz", hash = "sha256:4bfe8090e77d61e7310e52a2c46bfa09aab8bf45d81806c19545b4f5269ca61c"},
+    {file = "openshift_python_wrapper-10.0.65.tar.gz", hash = "sha256:cbaa7d5785474d2d05325e4f2893d38b1d85815bbf476a22e18c635786ef5690"},
 ]
 
 [package.dependencies]
@@ -1641,12 +1641,12 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.30"
+version = "1.0.31"
 description = "A simple logger for python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "python_simple_logger-1.0.30.tar.gz", hash = "sha256:3ae7f5f2496c11c0be7d289d1eecae484c23cd561b5423340b1071315760371d"},
+    {file = "python_simple_logger-1.0.31.tar.gz", hash = "sha256:ff93fc2c1f7dd46b9e00063f1b2a0ced26091a32713166294f4cb6c73d4f5ca6"},
 ]
 
 [package.dependencies]
@@ -1947,12 +1947,12 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.34"
+version = "0.0.35"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "timeout_sampler-0.0.34.tar.gz", hash = "sha256:1d964dc370c1cbd616c1e877ac996a8bf3e24b8aeecc9a70158e46e638217367"},
+    {file = "timeout_sampler-0.0.35.tar.gz", hash = "sha256:2e14991e232a20bfec5b864ba2487674c1cc368c51de83c656895da13b288c32"},
 ]
 
 [package.dependencies]
