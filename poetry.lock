@@ -1169,19 +1169,19 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.56"
+version = "5.0.57"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_utilities-5.0.56.tar.gz", hash = "sha256:5bb975e13c6239bc0f286fa93d537b1fd439b7b53d7ea2440e1f92b849e6b884"},
+    {file = "openshift_python_utilities-5.0.57.tar.gz", hash = "sha256:2540613445ab6e8ae35191290146d2bd5d4e006b258a2f6f2b7f5b0771fe935a"},
 ]
 
 [package.dependencies]
 beautifulsoup4 = ">=4.12.3,<5.0.0"
 colorlog = ">=6.7.0,<7.0.0"
 deprecation = ">=2.1.0,<3.0.0"
-openshift-python-wrapper = ">=10.0.4"
+openshift-python-wrapper = "*"
 openshift-python-wrapper-data-collector = ">=1.0.4"
 pyhelper-utils = ">=0.0.22"
 python-simple-logger = ">=1.0.5"
