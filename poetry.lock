@@ -1183,12 +1183,12 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.65"
+version = "5.0.66"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_utilities-5.0.65.tar.gz", hash = "sha256:dfa08598f21a4066be61b60e1b5d54aa14995386ee0a479c9f865288d092ed61"},
+    {file = "openshift_python_utilities-5.0.66.tar.gz", hash = "sha256:ff01faf0bdc33b2bdb8f15c94e8bfb593f8c1bcc2af9e0c060208bc8afe8dc53"},
 ]
 
 [package.dependencies]
@@ -1206,12 +1206,12 @@ timeout-sampler = ">=0.0.17"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "10.0.84"
+version = "10.0.85"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_wrapper-10.0.84.tar.gz", hash = "sha256:11b54d7aa4f5719e76b6bf9a7dfc48ea0b1d32b0b24dcbcdc09402e9cf37aa2d"},
+    {file = "openshift_python_wrapper-10.0.85.tar.gz", hash = "sha256:4c27fe1c44b5895b5a12513af460b56956fe53ac98591d63b2b72adb0c3f0362"},
 ]
 
 [package.dependencies]
@@ -1221,7 +1221,7 @@ colorlog = ">=6.7.0,<7.0.0"
 jinja2 = ">=3.1.2,<4.0.0"
 kubernetes = ">=30.0.0,<31.0.0"
 packaging = ">=23.1,<24.0"
-pyhelper-utils = ">=0.0.39,<0.0.40"
+pyhelper-utils = ">=0.0.40,<0.0.41"
 pytest = ">=8.0.0,<9.0.0"
 python-benedict = ">=0.33.0,<0.34.0"
 python-simple-logger = ">=1.0.6"
@@ -1491,12 +1491,12 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyhelper-utils"
-version = "0.0.39"
+version = "0.0.40"
 description = "Collective utility functions for python projects"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pyhelper_utils-0.0.39.tar.gz", hash = "sha256:4d2955098e17abec1e822e39824132e2651486a7ff156b6c23cecda9bd7752ea"},
+    {file = "pyhelper_utils-0.0.40.tar.gz", hash = "sha256:20f8c2a7d0c9ae3983fcfb60249e74ee0d674cbe742d375357474fa990a497ed"},
 ]
 
 [package.dependencies]
@@ -1659,12 +1659,12 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.38"
+version = "1.0.39"
 description = "A simple logger for python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "python_simple_logger-1.0.38.tar.gz", hash = "sha256:3e88a22f31485b1ab5d1c4da56ffe8dd27d6453f79f6f9859978ecd76083f58e"},
+    {file = "python_simple_logger-1.0.39.tar.gz", hash = "sha256:e66957ec05d03fd064d1753d6477da7864fe108c6c7ed9aad3b0f03d6d210e24"},
 ]
 
 [package.dependencies]
@@ -1774,12 +1774,12 @@ files = [
 
 [[package]]
 name = "redhat-qe-cloud-tools"
-version = "1.0.89"
+version = "1.0.90"
 description = "Python utilities to manage cloud services, such as AWS."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "redhat_qe_cloud_tools-1.0.89.tar.gz", hash = "sha256:7e016dd63b31d6661880c47878a52600213c1d6f41169a4f57f1177ef98d326f"},
+    {file = "redhat_qe_cloud_tools-1.0.90.tar.gz", hash = "sha256:e01b0229763ef8c76ee5989936e72c9c9d37b0967fc3c52dfed4909d4f9ec851"},
 ]
 
 [package.dependencies]
@@ -1795,7 +1795,7 @@ colorlog = ">=6.7.0,<7.0.0"
 configparser = ">=7.0.0,<8.0.0"
 google-cloud-compute = ">=1.14.1,<2.0.0"
 openshift-python-utilities = ">=5.0.49,<6.0.0"
-pyhelper-utils = ">=0.0.39,<0.0.40"
+pyhelper-utils = ">=0.0.40,<0.0.41"
 python-simple-logger = ">=1.0.5"
 
 [[package]]
@@ -1994,12 +1994,12 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.44"
+version = "0.0.45"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "timeout_sampler-0.0.44.tar.gz", hash = "sha256:5552d30cf222f5cd3bae519b861ad255982fdb690cdb2b0c0bfd0ccbd45a20af"},
+    {file = "timeout_sampler-0.0.45.tar.gz", hash = "sha256:07c5b439c9240312fc4074114093823c0b017a568325cdd1c122a0233628ec37"},
 ]
 
 [package.dependencies]
