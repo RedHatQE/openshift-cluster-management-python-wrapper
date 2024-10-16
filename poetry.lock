@@ -1237,12 +1237,12 @@ timeout-sampler = ">=0.0.17"
 
 [[package]]
 name = "openshift-python-wrapper"
-version = "10.0.98"
+version = "10.0.99"
 description = "Wrapper around https://github.com/kubernetes-client/python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "openshift_python_wrapper-10.0.98.tar.gz", hash = "sha256:29d4228a661d17f6da9fbf6a401f1ad5612a1f45fdf2fc1d11e5094839483df6"},
+    {file = "openshift_python_wrapper-10.0.99.tar.gz", hash = "sha256:c7c59b035532ab5447a0f6b2b83eb340042c309f74dd6bf7f3fee52b83a4417d"},
 ]
 
 [package.dependencies]
@@ -1703,12 +1703,12 @@ six = "*"
 
 [[package]]
 name = "python-simple-logger"
-version = "1.0.40"
+version = "1.0.41"
 description = "A simple logger for python"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "python_simple_logger-1.0.40.tar.gz", hash = "sha256:5194447ca8dd743e668f32df880ccd766100339f0d24f922dd4e849066770946"},
+    {file = "python_simple_logger-1.0.41.tar.gz", hash = "sha256:9890bf0698fc670eaff6430462ac1da16baad51f3139395e9c8056a2df1e7174"},
 ]
 
 [package.dependencies]
@@ -1818,12 +1818,12 @@ files = [
 
 [[package]]
 name = "redhat-qe-cloud-tools"
-version = "1.0.92"
+version = "1.0.94"
 description = "Python utilities to manage cloud services, such as AWS."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "redhat_qe_cloud_tools-1.0.92.tar.gz", hash = "sha256:4bcd0710c0658b29f813583333986d7f71b763626ed636ab9897345db59e5508"},
+    {file = "redhat_qe_cloud_tools-1.0.94.tar.gz", hash = "sha256:49a8abfdc1bffdd4eae7a5f143d322e671acca2080c59b320d043fd3225d435c"},
 ]
 
 [package.dependencies]
@@ -2038,12 +2038,12 @@ files = [
 
 [[package]]
 name = "timeout-sampler"
-version = "0.0.46"
+version = "0.0.47"
 description = "Timeout utility class to wait for any function output and interact with it in given time"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "timeout_sampler-0.0.46.tar.gz", hash = "sha256:286dadc6920bb8976b1247759ab5f546c56caa1ac8adc878862b1a2a614e7b12"},
+    {file = "timeout_sampler-0.0.47.tar.gz", hash = "sha256:1922eb3417bff24cd3c0dda984fec8f669d0784332b09f179bad2d78b47eca99"},
 ]
 
 [package.dependencies]
