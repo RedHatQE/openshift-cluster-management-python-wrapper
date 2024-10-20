@@ -25,6 +25,7 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent",
 ]
+packages = [{ include = "ocm_python_wrapper" }]
 
 [tool.poetry.dependencies]
 python = "^3.8"
