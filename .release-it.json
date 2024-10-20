@@ -1,7 +1,7 @@
 {
   "npm": {
-    "publish": false
-  },
+      "publish": false
+    },
   "git": {
     "requireCleanWorkingDir": true,
     "requireBranch": false,
@@ -17,7 +17,9 @@
     "tagAnnotation": "Release ${version}",
     "tagArgs": [],
     "push": true,
-    "pushArgs": ["--follow-tags"],
+    "pushArgs": [
+      "--follow-tags"
+    ],
     "pushRepo": "",
     "changelog": "git log --pretty=format:\"* %s (%h) by %an on %as\" ${from}...${to}"
   },
@@ -38,8 +40,7 @@
   },
   "plugins": {
     "@release-it/bumper": {
-      "in": "pyproject.toml",
-      "out": { "file": "pyproject.toml", "path": "project.version" }
+      "in": "VERSION",
+      "out": "VERSION"
     }
-  }
-}
+  }}
