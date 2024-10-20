@@ -4,57 +4,59 @@ line-length = 120
 fix = true
 output-format = "grouped"
 
-[tool.ruff.format]
-exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
-
-[build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
-build-backend = "poetry_dynamic_versioning.backend"
+  [tool.ruff.format]
+  exclude = [ ".git", ".venv", ".mypy_cache", ".tox", "__pycache__" ]
 
 [tool.poetry]
 name = "openshift-cluster-management-python-wrapper"
 description = "Wrapper around https://github.com/openshift/openshift-cluster-management-python-client"
-version = "0.0.0"
-authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
+version = "1.0.140"
+authors = [
+  "Meni Yakove <myakove@gmail.com>",
+  "Ruth Netser <rnetser@gmail.com>"
+]
 readme = "README.md"
 license = "Apache-2.0"
 homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper"
 documentation = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/blob/main/README.md"
-keywords = ["Openshift", "OCM"]
+keywords = [ "Openshift", "OCM" ]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "Operating System :: OS Independent",
+  "Operating System :: OS Independent"
 ]
-packages = [{ include = "ocm_python_wrapper" }]
-# Include ocm-python-wrapper package data:
-include = [{ path = "manifests/*.json" }]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-colorlog = "^6.7.0"
-python-simple-logger = ">=1.0.5"
-rosa-python-client = ">=1.0.28"
-openshift-cluster-management-python-client = ">=1.0.23"
-openshift-python-wrapper = ">=10.0.0"
-requests = "^2.31.0"
-pyyaml = "^6.0.1"
-openshift-python-utilities = ">=5.0.0"
-importlib = "^1.0.4"
-redhat-qe-cloud-tools = ">=1.0.10"
-timeout-sampler = ">=0.0.2"
-python-benedict = ">=0.34.0"
+  [[tool.poetry.packages]]
+  include = "ocm_python_wrapper"
+
+  [[tool.poetry.include]]
+  path = "manifests/*.json"
+
+  [tool.poetry.dependencies]
+  python = "^3.8"
+  colorlog = "^6.7.0"
+  python-simple-logger = ">=1.0.5"
+  openshift-cluster-management-python-client = ">=1.0.23"
+  openshift-python-wrapper = ">=10.0.0"
+  requests = "^2.31.0"
+  pyyaml = "^6.0.1"
+  openshift-python-utilities = ">=5.0.0"
+  importlib = "^1.0.4"
+  redhat-qe-cloud-tools = ">=1.0.10"
+  timeout-sampler = ">=0.0.2"
+  python-benedict = ">=0.34.0"
+  rosa-python-client = "^1.0.121"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
 ipython = "*"
 
-[tool.poetry-dynamic-versioning]
-enable = true
-pattern = "((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)"
+  [tool.poetry.urls]
+  Download = "https://pypi.org/project/openshift-cluster-management-python-wrapper/"
+  "Bug Tracker" = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/issues"
 
-[tool.poetry-dynamic-versioning.substitution]
-files = ["VERSION"]
+[build-system]
+requires = [ "poetry-core>=1.0.0" ]
+build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.urls]
-Download = "https://pypi.org/project/openshift-cluster-management-python-wrapper/"
-"Bug Tracker" = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/issues"
+[project]
+version = "1.0.141"
