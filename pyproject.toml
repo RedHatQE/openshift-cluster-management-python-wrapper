@@ -7,14 +7,10 @@ output-format = "grouped"
 [tool.ruff.format]
 exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
 
-[build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
-build-backend = "poetry_dynamic_versioning.backend"
-
 [tool.poetry]
 name = "openshift-cluster-management-python-wrapper"
 description = "Wrapper around https://github.com/openshift/openshift-cluster-management-python-client"
-version = "0.0.0"
+version = "1.0.140"
 authors = ["Meni Yakove <myakove@gmail.com>", "Ruth Netser <rnetser@gmail.com>"]
 readme = "README.md"
 license = "Apache-2.0"
@@ -33,7 +29,6 @@ include = [{ path = "manifests/*.json" }]
 python = "^3.8"
 colorlog = "^6.7.0"
 python-simple-logger = ">=1.0.5"
-rosa-python-client = ">=1.0.28"
 openshift-cluster-management-python-client = ">=1.0.23"
 openshift-python-wrapper = ">=10.0.0"
 requests = "^2.31.0"
@@ -43,18 +38,16 @@ importlib = "^1.0.4"
 redhat-qe-cloud-tools = ">=1.0.10"
 timeout-sampler = ">=0.0.2"
 python-benedict = ">=0.34.0"
+rosa-python-client = "^1.0.121"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
 ipython = "*"
 
-[tool.poetry-dynamic-versioning]
-enable = true
-pattern = "((?P<epoch>\\d+)!)?(?P<base>\\d+(\\.\\d+)*)"
-
-[tool.poetry-dynamic-versioning.substitution]
-files = ["VERSION"]
-
 [tool.poetry.urls]
 Download = "https://pypi.org/project/openshift-cluster-management-python-wrapper/"
 "Bug Tracker" = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/issues"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
