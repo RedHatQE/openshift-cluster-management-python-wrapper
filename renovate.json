@@ -1,1 +1,24 @@
-{"$schema": "https://docs.renovatebot.com/renovate-schema.json", "packageRules": [{"matchPackagePatterns": ["colorlog", "python-simple-logger", "rosa-python-client", "openshift-cluster-management-python-client", "openshift-python-wrapper", "requests", "pyyaml", "openshift-python-utilities", "importlib", "redhat-qe-cloud-tools", "timeout-sampler", "python-benedict", "ipdb", "ipython"], "groupName": "poetry-deps"}]}
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "colorlog",
+        "python-simple-logger",
+        "rosa-python-client",
+        "openshift-cluster-management-python-client",
+        "openshift-python-wrapper",
+        "requests",
+        "pyyaml",
+        "openshift-python-utilities",
+        "importlib",
+        "redhat-qe-cloud-tools",
+        "timeout-sampler",
+        "python-benedict",
+        "ipdb",
+        "ipython"
+      ],
+      "groupName": "poetry-deps"
+    }
+  ]
+}
