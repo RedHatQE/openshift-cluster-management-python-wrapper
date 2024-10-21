@@ -2,6 +2,10 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "packageRules": [
     {
+      "matchPackageNames": ["python-benedict"],
+      "enabled": false
+    },
+    {
       "matchPackagePatterns": [
         "colorlog",
         "python-simple-logger",
