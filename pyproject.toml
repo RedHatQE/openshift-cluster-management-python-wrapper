@@ -40,7 +40,7 @@ importlib = "^1.0.4"
 redhat-qe-cloud-tools = ">=1.0.10"
 timeout-sampler = ">=0.0.2"
 python-benedict = "==0.33.2"
-rosa-python-client = "^1.0.125"
+rosa-python-client = "*"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
