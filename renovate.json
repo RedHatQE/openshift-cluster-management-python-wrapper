@@ -18,7 +18,6 @@
         "importlib",
         "redhat-qe-cloud-tools",
         "timeout-sampler",
-        "python-benedict",
         "ipdb",
         "ipython"
       ],
