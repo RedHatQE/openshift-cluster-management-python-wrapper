@@ -1341,12 +1341,12 @@ urllib3 = ">=1.25.3"
 
 [[package]]
 name = "openshift-python-utilities"
-version = "5.0.72"
+version = "5.0.73"
 description = "A utilities repository for https://github.com/RedHatQE/openshift-python-wrapper"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "openshift_python_utilities-5.0.72.tar.gz", hash = "sha256:e84baae27844d935d45db540b21f1712d7f18aaa634887e8275406d392668690"},
+    {file = "openshift_python_utilities-5.0.73.tar.gz", hash = "sha256:56ef35996b6f46f4589442bcc52074a536ed3c2625b8acdad58df50906369588"},
 ]
 
 [package.dependencies]
@@ -1662,12 +1662,12 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pyhelper-utils"
-version = "0.0.43"
+version = "0.0.44"
 description = "Collective utility functions for python projects"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pyhelper_utils-0.0.43.tar.gz", hash = "sha256:a90694f9f9df8bcd5369c53f222dfbcd1946650a5f1255a87184f3c03b4bca30"},
+    {file = "pyhelper_utils-0.0.44.tar.gz", hash = "sha256:de21bc9de7eea02bc4e1b85686e18eb49dde3d7f41b45f1cfc498df0e47abc17"},
 ]
 
 [package.dependencies]
@@ -1984,12 +1984,12 @@ files = [
 
 [[package]]
 name = "redhat-qe-cloud-tools"
-version = "1.0.95"
+version = "1.0.96"
 description = "Python utilities to manage cloud services, such as AWS."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "redhat_qe_cloud_tools-1.0.95.tar.gz", hash = "sha256:82d20634270b8d5ba48af31b0adefdfa08ea9c73a25928fce2e4c3ebd7b54210"},
+    {file = "redhat_qe_cloud_tools-1.0.96.tar.gz", hash = "sha256:bf17be5899d4295d587f11e8fdbd6e4d5f5ef3da3908daa4860efa5d5edde63a"},
 ]
 
 [package.dependencies]
@@ -2005,7 +2005,7 @@ colorlog = ">=6.7.0,<7.0.0"
 configparser = ">=7.0.0,<8.0.0"
 google-cloud-compute = ">=1.14.1,<2.0.0"
 openshift-python-utilities = ">=5.0.49,<6.0.0"
-pyhelper-utils = ">=0.0.43,<0.0.44"
+pyhelper-utils = ">=0.0.44,<0.0.45"
 python-simple-logger = ">=1.0.5"
 
 [[package]]
