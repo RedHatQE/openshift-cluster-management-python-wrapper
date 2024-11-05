@@ -28,7 +28,7 @@ classifiers = [
 packages = [{ include = "ocm_python_wrapper" }]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 colorlog = "^6.7.0"
 python-simple-logger = ">=1.0.5"
 openshift-cluster-management-python-client = ">=1.0.23"
