@@ -15,7 +15,7 @@ from ocm_python_client.model.add_on_installation_parameter import (
     AddOnInstallationParameter,
 )
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
-from ocp_resources.utils.constants import NO_FOUND_ERROR_EXCEPTION_DICT
+from ocp_resources.utils.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
 from ocp_resources.job import Job
 from ocp_resources.resource import ResourceEditor
@@ -767,7 +767,7 @@ class ClusterAddOn(Cluster):
                 ),
                 exceptions_dict={
                     NotImplementedError: [],
-                    **NO_FOUND_ERROR_EXCEPTION_DICT,
+                    **NOT_FOUND_ERROR_EXCEPTION_DICT,
                 },
             ):
                 if rhmi_sample and rhmi_sample.exists:
