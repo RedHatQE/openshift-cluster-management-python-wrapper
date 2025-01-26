@@ -1,18 +1,14 @@
 [project]
 name = "openshift-cluster-management-python-wrapper"
-version = "2.0.10"
+version = "2.0.11"
 description = "Wrapper around https://github.com/openshift/openshift-cluster-management-python-client"
-authors = [
-  { name = "Meni Yakove", email = "myakove@gmail.com" },
-  { name = "Ruth Netser", email = "rnetser@gmail.com" },
-]
 requires-python = "~=3.9"
 readme = "README.md"
 license = "Apache-2.0"
-keywords = ["Openshift", "OCM"]
+keywords = [ "Openshift", "OCM" ]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "Operating System :: OS Independent",
+  "Operating System :: OS Independent"
 ]
 dependencies = [
   "colorlog>=6.7.0,<7",
@@ -26,14 +22,22 @@ dependencies = [
   "redhat-qe-cloud-tools>=1.0.10",
   "timeout-sampler>=0.0.2",
   "python-benedict==0.33.2",
-  "rosa-python-client",
+  "rosa-python-client"
 ]
 
-[project.urls]
-Homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper"
-Documentation = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/blob/main/README.md"
-Download = "https://pypi.org/project/openshift-cluster-management-python-wrapper/"
-"Bug Tracker" = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/issues"
+  [[project.authors]]
+  name = "Meni Yakove"
+  email = "myakove@gmail.com"
+
+  [[project.authors]]
+  name = "Ruth Netser"
+  email = "rnetser@gmail.com"
+
+  [project.urls]
+  Homepage = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper"
+  Documentation = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/blob/main/README.md"
+  Download = "https://pypi.org/project/openshift-cluster-management-python-wrapper/"
+  "Bug Tracker" = "https://github.com/RedHatQE/openshift-cluster-management-python-wrapper/issues"
 
 [tool.ruff]
 preview = true
@@ -41,18 +45,18 @@ line-length = 120
 fix = true
 output-format = "grouped"
 
-[dependency-groups]
-dev = ["ipdb>=0.13.13,<0.14", "ipython"]
-
-[tool.ruff.format]
-exclude = [".git", ".venv", ".mypy_cache", ".tox", "__pycache__"]
+  [tool.ruff.format]
+  exclude = [ ".git", ".venv", ".mypy_cache", ".tox", "__pycache__" ]
 
 [tool.hatch.build.targets.sdist]
-include = ["ocm_python_wrapper"]
+include = [ "ocm_python_wrapper" ]
 
 [tool.hatch.build.targets.wheel]
-include = ["ocm_python_wrapper"]
+include = [ "ocm_python_wrapper" ]
+
+[dependency-groups]
+dev = [ "ipdb>=0.13.13,<0.14", "ipython" ]
 
 [build-system]
-requires = ["hatchling"]
+requires = [ "hatchling" ]
 build-backend = "hatchling.build"
