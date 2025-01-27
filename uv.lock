@@ -69,7 +69,7 @@ wheels = [
 
 [[package]]
 name = "azure-mgmt-network"
-version = "28.1.0"
+version = "27.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
@@ -77,14 +77,14 @@ dependencies = [
     { name = "isodate" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/19/a3/8d2fa6e33107354c8cd2abcca4e0f02138bda4c6024984ae5fce5cf23b27/azure_mgmt_network-28.1.0.tar.gz", hash = "sha256:8c84bffb5ec75c6e0244e58ecf07c00d5fc421d616b0cb369c6fe585af33cf87", size = 651528 }
+sdist = { url = "https://files.pythonhosted.org/packages/bf/aa/bf464fd70eefa8f13f5e5b45d021416d5c9c8d79eabb96f4a673fe91346d/azure_mgmt_network-27.0.0.tar.gz", hash = "sha256:5c1c61d8bb13ad40f788a26fd7569c1d9d60eb2e4cb19c2a1b5d9c02ae862316", size = 708715 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/68/d1604383635f1f1b16cd7f1e27004db40a1f0493c57b2da9fb36dc775a79/azure_mgmt_network-28.1.0-py3-none-any.whl", hash = "sha256:8ddb0e9ec8f10c9c152d60fc945908d113e4591f397ea3e40b92290ec2b01658", size = 575260 },
+    { url = "https://files.pythonhosted.org/packages/e1/57/b6f449af387432ac2cbb75b71192773d030c084fdd4bc13de07d3d61de96/azure_mgmt_network-27.0.0-py3-none-any.whl", hash = "sha256:67295fda351fdae79d14591487009e911346adea9578bb1b04636a15e3472598", size = 641254 },
 ]
 
 [[package]]
 name = "azure-mgmt-redhatopenshift"
-version = "2.0.0"
+version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-common" },
@@ -92,9 +92,9 @@ dependencies = [
     { name = "isodate" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d9/ee/8cf9dd46b9d136c5a2886514ff565c3ae9ae477cc4607353f95c38150aba/azure_mgmt_redhatopenshift-2.0.0.tar.gz", hash = "sha256:9d304acbba7c9f42561269f707210aada9c7b5ea0990f2722df60599a08e3aae", size = 65787 }
+sdist = { url = "https://files.pythonhosted.org/packages/01/a2/b89ba36f4bc2708a7ab0115b451028b8888184b3c19bd9a3ac71afec8941/azure-mgmt-redhatopenshift-1.5.0.tar.gz", hash = "sha256:51fb7429c39c88acc9fa273d9f89f19303520662996a6d7d8e1122a98f5f2527", size = 234247 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ba/48/4dc24fab26ddb073f01cafff6fc728e8e42d9eeb5c66ec28764817ee7d76/azure_mgmt_redhatopenshift-2.0.0-py3-none-any.whl", hash = "sha256:c18c47253f18c7751a941ee939e645f9739786a0117e27fbe408012b980f7f44", size = 90096 },
+    { url = "https://files.pythonhosted.org/packages/73/2a/7af059d94722f31161fde0b253a4c751386d5bd6826902be5052fe347728/azure_mgmt_redhatopenshift-1.5.0-py3-none-any.whl", hash = "sha256:45d8145ae11709cd80c01df879d29442cf08272c2b3ee557b4692dd2c1039b5d", size = 408410 },
 ]
 
 [[package]]
@@ -365,7 +365,7 @@ name = "click"
 version = "8.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593 }
 wheels = [
@@ -1060,7 +1060,7 @@ requires-dist = [
     { name = "openshift-cluster-management-python-client", specifier = ">=1.0.23" },
     { name = "openshift-python-utilities", specifier = ">=5.0.0" },
     { name = "openshift-python-wrapper", specifier = ">=11.0.14" },
-    { name = "python-benedict", specifier = "==0.33.2" },
+    { name = "python-benedict", specifier = "==0.34.1" },
     { name = "python-simple-logger", specifier = ">=1.0.5" },
     { name = "pyyaml", specifier = ">=6.0.1,<7" },
     { name = "redhat-qe-cloud-tools", specifier = ">=1.0.10" },
@@ -1077,7 +1077,7 @@ dev = [
 
 [[package]]
 name = "openshift-python-utilities"
-version = "6.0.4"
+version = "5.0.73"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1092,7 +1092,7 @@ dependencies = [
     { name = "semver" },
     { name = "timeout-sampler" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b9/30/85316e28bb7c3c2212c743793728e3fd059426b678e186a4369710a88efc/openshift_python_utilities-6.0.4.tar.gz", hash = "sha256:18c5a7cf4415755e9f4df159a5ad58660f8c0a5107f4ce8b079b8ac5322156e0", size = 17966 }
+sdist = { url = "https://files.pythonhosted.org/packages/81/83/aaba0e774e90612814c105a9badc57f65b996c82c5f857564a6497c3b8af/openshift_python_utilities-5.0.73.tar.gz", hash = "sha256:56ef35996b6f46f4589442bcc52074a536ed3c2625b8acdad58df50906369588", size = 18369 }
 
 [[package]]
 name = "openshift-python-wrapper"
@@ -1207,7 +1207,7 @@ name = "portalocker"
 version = "2.10.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pywin32", marker = "platform_system == 'Windows'" },
+    { name = "pywin32", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ed/d3/c6c64067759e87af98cc668c1cc75171347d0f1577fab7ca3749134e3cd4/portalocker-2.10.1.tar.gz", hash = "sha256:ef1bf844e878ab08aee7e40184156e1151f228f103aa5c6bd0724cc330960f8f", size = 40891 }
 wheels = [
@@ -1313,7 +1313,7 @@ wheels = [
 
 [[package]]
 name = "pyhelper-utils"
-version = "1.0.5"
+version = "0.0.44"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ipdb" },
@@ -1322,7 +1322,7 @@ dependencies = [
     { name = "requests" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dc/9b/6de5b0082cee3b286389883e0c601698e83ff2a9cd94a99aa3c0dc0acfd8/pyhelper_utils-1.0.5.tar.gz", hash = "sha256:f2b2ae669bac81491d563e1eb8e67e6a0d479241cfe86da91d677b201336c576", size = 9497 }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/ef/384a05ec3d49a6f7cdceedf012dba834bb760087c5e5ee7cfcd30e3ef642/pyhelper_utils-0.0.44.tar.gz", hash = "sha256:de21bc9de7eea02bc4e1b85686e18eb49dde3d7f41b45f1cfc498df0e47abc17", size = 9756 }
 
 [[package]]
 name = "pyjwt"
@@ -1389,18 +1389,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pytest-mock"
-version = "3.14.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/90/a955c3ab35ccd41ad4de556596fa86685bf4fc5ffcc62d22d856cfd4e29a/pytest-mock-3.14.0.tar.gz", hash = "sha256:2719255a1efeceadbc056d6bf3df3d1c5015530fb40cf347c0f9afac88410bd0", size = 32814 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/3b/b26f90f74e2986a82df6e7ac7e319b8ea7ccece1caec9f8ab6104dc70603/pytest_mock-3.14.0-py3-none-any.whl", hash = "sha256:0b72c38033392a5f4621342fe11e9219ac11ec9d375f8e2a0c164539e0d70f6f", size = 9863 },
-]
-
-[[package]]
 name = "pytest-testconfig"
 version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1415,16 +1403,16 @@ wheels = [
 
 [[package]]
 name = "python-benedict"
-version = "0.33.2"
+version = "0.34.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-fsutil" },
     { name = "python-slugify" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/57/63/a3d1de78d75b28e9105c236565b9f0366e009abb489a5acb09911fcf5768/python-benedict-0.33.2.tar.gz", hash = "sha256:662de43bffb4e127da2056447f8ddd7f6f5c89b72dd66d289cf9abd1cc2720c8", size = 53224 }
+sdist = { url = "https://files.pythonhosted.org/packages/b3/a8/744dce47aeba978a516f13c0d728fa1236217fa9e75e2619891df8100e85/python_benedict-0.34.1.tar.gz", hash = "sha256:0a81784c826c8983c485bb647ed5e6c8fad139c3921ea1844b21e41da0ff0dc0", size = 53340 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/68/5f/e32644b743d33142c6c43af50c86c6a5f535c3b3fa5b50c92aecded37741/python_benedict-0.33.2-py3-none-any.whl", hash = "sha256:50a69b601b34d4ad7b67fe94e3266ec05046bc547a4132fe43fd8fbd41aeefaa", size = 51285 },
+    { url = "https://files.pythonhosted.org/packages/94/65/c59fb6eec8859047394ccd73eaf1623ce9fd82c48d880d9a072045669bc5/python_benedict-0.34.1-py3-none-any.whl", hash = "sha256:f09711ca2d8e716ca40440f1e26dfa3ccff15e08f1baa88de594fbba799cf87a", size = 51308 },
 ]
 
 [[package]]
@@ -1471,12 +1459,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/45/60/571982c7af8f5453b
 
 [[package]]
 name = "python-simple-logger"
-version = "2.0.3"
+version = "1.0.42"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorlog" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ab/d0/f1c4c118512c1211232d0a7037827e1e8f5582575cacd40079f5b38b9edb/python_simple_logger-2.0.3.tar.gz", hash = "sha256:8bc1b66ef567dd700945c7103287e5284dd1941d117c6d66f6a66a63b214d7da", size = 8072 }
+sdist = { url = "https://files.pythonhosted.org/packages/28/64/43d256b46b8f9e2d227425b896cc8f7eb6cfc276219be8924f5d622a8038/python_simple_logger-1.0.42.tar.gz", hash = "sha256:ad8ffd2019bcf824377d4ac2ac295b29210de0572ac85b45a8e250acf9ca0053", size = 8236 }
 
 [[package]]
 name = "python-slugify"
@@ -1566,7 +1554,7 @@ wheels = [
 
 [[package]]
 name = "redhat-qe-cloud-tools"
-version = "2.0.7"
+version = "1.0.96"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "azure-core" },
@@ -1584,7 +1572,7 @@ dependencies = [
     { name = "pyhelper-utils" },
     { name = "python-simple-logger" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/53/65/c1dbc64fe9f50e59070af3974c4c839f7a2212f5a3f88606b008ff5f0d43/redhat_qe_cloud_tools-2.0.7.tar.gz", hash = "sha256:bcb4f4eee1fd27bc7db8d3a220a3d590a00069a80e1007acda95aa8f60d21145", size = 15113 }
+sdist = { url = "https://files.pythonhosted.org/packages/24/6a/b2907f2a3ab14597865521e9d8ca0c757aba3dd6c33888a639179a2a80c9/redhat_qe_cloud_tools-1.0.96.tar.gz", hash = "sha256:bf17be5899d4295d587f11e8fdbd6e4d5f5ef3da3908daa4860efa5d5edde63a", size = 15822 }
 
 [[package]]
 name = "requests"
@@ -1631,18 +1619,16 @@ wheels = [
 
 [[package]]
 name = "rosa-python-client"
-version = "2.0.5"
+version = "1.0.14"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "coverage" },
-    { name = "openshift-cluster-management-python-wrapper" },
-    { name = "pytest-cov" },
-    { name = "pytest-mock" },
-    { name = "python-benedict" },
     { name = "python-simple-logger" },
     { name = "redhat-qe-cloud-tools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/67/15/e8437c988a37928045b8abbf13bbec7f833f8e2643d3577328f852dfd112/rosa_python_client-2.0.5.tar.gz", hash = "sha256:5e34d288631ec4b409dc119641836b4d9ba26c15a202b48a58d90aa32ff0d0f3", size = 6404 }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/e2/951f116505c63e7814476b0705591d30444300310ede460ba53a8f2a3120/rosa_python_client-1.0.14.tar.gz", hash = "sha256:07b299a5199a42111b42d340b22b303c27c4875143b585bdf96b78d190be49b9", size = 3689 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d9/0e/6aee6221c227c5c12e1edbba32ab534cb7a418cadffb8e2fcdae2cfda04c/rosa_python_client-1.0.14-py3-none-any.whl", hash = "sha256:f45d708b169c6edad168008be0c53e758229970ae286b8ed92ed19a2c81a5aaa", size = 4183 },
+]
 
 [[package]]
 name = "rsa"
@@ -1762,13 +1748,12 @@ wheels = [
 
 [[package]]
 name = "timeout-sampler"
-version = "1.0.6"
+version = "1.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pytest" },
     { name = "python-simple-logger" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cc/ba/b49a750ffb8a2480dfd19cbeef28107b33d8d14d9170815c7aa9c988f2cc/timeout_sampler-1.0.6.tar.gz", hash = "sha256:99a9553139271e7fda6cef8c061e8911483f2fdc8c3c13fff67573f895ecf978", size = 17817 }
+sdist = { url = "https://files.pythonhosted.org/packages/e6/40/666561ffecb9b50adae217919875c39f2de73b36245a60f0e16a6e5526e6/timeout_sampler-1.0.3.tar.gz", hash = "sha256:e07826c346fc591422fc94664c776c139341198edefde69d25732893c4f09188", size = 3658 }
 
 [[package]]
 name = "tomli"
