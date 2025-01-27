@@ -1,27 +1,18 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    ":dependencyDashboard",
+    ":maintainLockFilesWeekly",
+    ":prHourlyLimitNone"
+  ],
+  "prConcurrentLimit": 0,
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "packageRules": [
     {
-      "matchPackageNames": ["python-benedict"],
-      "enabled": false
-    },
-    {
-      "matchPackagePatterns": [
-        "colorlog",
-        "python-simple-logger",
-        "rosa-python-client",
-        "openshift-cluster-management-python-client",
-        "openshift-python-wrapper",
-        "requests",
-        "pyyaml",
-        "openshift-python-utilities",
-        "importlib",
-        "redhat-qe-cloud-tools",
-        "timeout-sampler",
-        "ipdb",
-        "ipython"
-      ],
-      "groupName": "poetry-deps"
+      "matchPackagePatterns": ["*"],
+      "groupName": "python-deps"
     }
   ]
 }
