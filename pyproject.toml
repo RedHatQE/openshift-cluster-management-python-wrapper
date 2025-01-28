@@ -1,6 +1,6 @@
 [project]
 name = "openshift-cluster-management-python-wrapper"
-version = "2.0.12"
+version = "2.0.13"
 description = "Wrapper around https://github.com/openshift/openshift-cluster-management-python-client"
 requires-python = "~=3.9"
 readme = "README.md"
