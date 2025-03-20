@@ -1140,7 +1140,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/f9/1f/ddb9e61bbe90b59f6
 
 [[package]]
 name = "openshift-cluster-management-python-wrapper"
-version = "2.0.15"
+version = "2.0.16"
 source = { editable = "." }
 dependencies = [
     { name = "colorlog" },
