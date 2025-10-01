@@ -21,7 +21,7 @@ dependencies = [
   "importlib>=1.0.4,<2",
   "redhat-qe-cloud-tools>=1.0.10",
   "timeout-sampler>=0.0.2",
-  "python-benedict==0.34.1",
+  "python-benedict==0.35.0",
   "rosa-python-client"
 ]
 
