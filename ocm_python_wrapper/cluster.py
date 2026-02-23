@@ -15,15 +15,15 @@ from ocm_python_client.model.add_on_installation_parameter import (
     AddOnInstallationParameter,
 )
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
-from ocp_resources.utils.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
 from ocp_resources.job import Job
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
-from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
+from ocp_resources.utils.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_utilities.infra import create_update_secret, get_client
-from simple_logger.logger import get_logger
 from ocp_utilities.must_gather import collect_must_gather
+from simple_logger.logger import get_logger
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 
 from ocm_python_wrapper.exceptions import MissingResourceError
 
@@ -560,7 +560,7 @@ class ClusterAddOn(Cluster):
             param_type = addon_parameters_dict[param["id"]]["value_type"]
             param_value = param["value"]
             if not isinstance(param_value, param_type):
-                param["value"] = param_type(param_value)  # noqa: FCN001
+                param["value"] = param_type(param_value)
 
         return _user_parameters
 
