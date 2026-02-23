@@ -45,6 +45,9 @@ line-length = 120
 fix = true
 output-format = "grouped"
 
+  [tool.ruff.lint]
+  external = [ "FCN001" ]
+
   [tool.ruff.format]
   exclude = [ ".git", ".venv", ".mypy_cache", ".tox", "__pycache__" ]
 

@@ -15,15 +15,15 @@ from ocm_python_client.model.add_on_installation_parameter import (
     AddOnInstallationParameter,
 )
 from ocm_python_client.model.upgrade_policy import UpgradePolicy
-from ocp_resources.utils.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_resources.image_content_source_policy import ImageContentSourcePolicy
 from ocp_resources.job import Job
 from ocp_resources.resource import ResourceEditor
 from ocp_resources.rhmi import RHMI
-from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
+from ocp_resources.utils.constants import NOT_FOUND_ERROR_EXCEPTION_DICT
 from ocp_utilities.infra import create_update_secret, get_client
-from simple_logger.logger import get_logger
 from ocp_utilities.must_gather import collect_must_gather
+from simple_logger.logger import get_logger
+from timeout_sampler import TimeoutExpiredError, TimeoutSampler, TimeoutWatch
 
 from ocm_python_wrapper.exceptions import MissingResourceError
 
@@ -162,8 +162,7 @@ class Cluster:
             LOGGER.error("Upgrade policy was not updated")
             raise
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def hypershift(self):
         return self.instance.hypershift.enabled is True
 
@@ -254,13 +253,11 @@ class Cluster:
     def cloud_provider(self):
         return self.instance.cloud_provider.id if self.exists else None
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def rosa(self):
         return self.instance.get(AWS_OSD_STR, {}).get("tags", {}).get("red-hat-clustertype") == "rosa"
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def region(self):
         return self.instance.get("region", {}).get("id")
 
@@ -547,12 +544,10 @@ class ClusterAddOn(Cluster):
             user_addon_parameters=user_addon_parameters,
         )
 
-        _user_parameters = self.update_param_value_type(
+        return self.update_param_value_type(
             _user_parameters=_user_parameters,
             addon_parameters_dict=addon_parameters_dict,
         )
-
-        return _user_parameters
 
     @staticmethod
     def update_param_value_type(_user_parameters, addon_parameters_dict):
@@ -655,9 +650,9 @@ class ClusterAddOn(Cluster):
                     res = rosa_cli.execute(command=command, ocm_client=self.client, aws_region=self.region)
             else:
                 if parameters:
-                    _parameters = []
-                    for params in parameters:
-                        _parameters.append(AddOnInstallationParameter(id=params["id"], value=params["value"]))
+                    _parameters = [
+                        AddOnInstallationParameter(id=params["id"], value=params["value"]) for params in parameters
+                    ]
 
                     _addon_installation_dict["parameters"] = {"items": _parameters}
                 res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
@@ -683,12 +678,6 @@ class ClusterAddOn(Cluster):
                 )
                 self.update_rhoam_cluster_storage_config()
 
-            if wait:
-                self.wait_for_install_state(state=self.State.READY, wait_timeout=wait_timeout)
-
-            LOGGER.info(f"{self.addon_name} v{self.addon_version} successfully installed")
-            return res
-
         except Exception as ex:
             LOGGER.error(f"{self.addon_name} Install Failed. \n{ex}")
             if must_gather_output_dir:
@@ -699,6 +688,12 @@ class ClusterAddOn(Cluster):
                     product_name=self.addon_name,
                 )
             raise
+        else:
+            if wait:
+                self.wait_for_install_state(state=self.State.READY, wait_timeout=wait_timeout)
+
+            LOGGER.info(f"{self.addon_name} v{self.addon_version} successfully installed")
+            return res
 
     def addon_installation_instance(self):
         try:
