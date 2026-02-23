@@ -162,8 +162,7 @@ class Cluster:
             LOGGER.error("Upgrade policy was not updated")
             raise
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def hypershift(self):
         return self.instance.hypershift.enabled is True
 
@@ -254,13 +253,11 @@ class Cluster:
     def cloud_provider(self):
         return self.instance.cloud_provider.id if self.exists else None
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def rosa(self):
         return self.instance.get(AWS_OSD_STR, {}).get("tags", {}).get("red-hat-clustertype") == "rosa"
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def region(self):
         return self.instance.get("region", {}).get("id")
 
@@ -547,12 +544,10 @@ class ClusterAddOn(Cluster):
             user_addon_parameters=user_addon_parameters,
         )
 
-        _user_parameters = self.update_param_value_type(
+        return self.update_param_value_type(
             _user_parameters=_user_parameters,
             addon_parameters_dict=addon_parameters_dict,
         )
-
-        return _user_parameters
 
     @staticmethod
     def update_param_value_type(_user_parameters, addon_parameters_dict):
@@ -560,7 +555,7 @@ class ClusterAddOn(Cluster):
             param_type = addon_parameters_dict[param["id"]]["value_type"]
             param_value = param["value"]
             if not isinstance(param_value, param_type):
-                param["value"] = param_type(param_value)
+                param["value"] = param_type(param_value)  # noqa: FCN001
 
         return _user_parameters
 
@@ -655,9 +650,9 @@ class ClusterAddOn(Cluster):
                     res = rosa_cli.execute(command=command, ocm_client=self.client, aws_region=self.region)
             else:
                 if parameters:
-                    _parameters = []
-                    for params in parameters:
-                        _parameters.append(AddOnInstallationParameter(id=params["id"], value=params["value"]))
+                    _parameters = [
+                        AddOnInstallationParameter(id=params["id"], value=params["value"]) for params in parameters
+                    ]
 
                     _addon_installation_dict["parameters"] = {"items": _parameters}
                 res = self.client.api_clusters_mgmt_v1_clusters_cluster_id_addons_post(
@@ -683,12 +678,6 @@ class ClusterAddOn(Cluster):
                 )
                 self.update_rhoam_cluster_storage_config()
 
-            if wait:
-                self.wait_for_install_state(state=self.State.READY, wait_timeout=wait_timeout)
-
-            LOGGER.info(f"{self.addon_name} v{self.addon_version} successfully installed")
-            return res
-
         except Exception as ex:
             LOGGER.error(f"{self.addon_name} Install Failed. \n{ex}")
             if must_gather_output_dir:
@@ -699,6 +688,12 @@ class ClusterAddOn(Cluster):
                     product_name=self.addon_name,
                 )
             raise
+        else:
+            if wait:
+                self.wait_for_install_state(state=self.State.READY, wait_timeout=wait_timeout)
+
+            LOGGER.info(f"{self.addon_name} v{self.addon_version} successfully installed")
+            return res
 
     def addon_installation_instance(self):
         try:

@@ -1,5 +1,3 @@
-#!/bin/python
-
 import requests
 from ocm_python_client.api.default_api import DefaultApi
 from ocm_python_client.api_client import ApiClient
