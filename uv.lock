@@ -1763,7 +1763,7 @@ requires-dist = [
     { name = "openshift-cluster-management-python-client", specifier = ">=1.0.23" },
     { name = "openshift-python-utilities", specifier = ">=5.0.0" },
     { name = "openshift-python-wrapper", specifier = ">=11.0.14" },
-    { name = "python-benedict", specifier = "==0.35.0" },
+    { name = "python-benedict", specifier = "==0.36.0" },
     { name = "python-simple-logger", specifier = ">=1.0.5" },
     { name = "pyyaml", specifier = ">=6.0.1,<7" },
     { name = "redhat-qe-cloud-tools", specifier = ">=1.0.10" },
@@ -2417,7 +2417,7 @@ wheels = [
 
 [[package]]
 name = "python-benedict"
-version = "0.35.0"
+version = "0.36.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-fsutil" },
@@ -2427,9 +2427,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "useful-types" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bc/7f/670cea45a5de7ba79b820b9e58c19ec28070e65f8fe4584edc14b3b86ff2/python_benedict-0.35.0.tar.gz", hash = "sha256:ca825742cb60641939857417b799c6ca6680ba1ed7d3a92cf722103bc8dcb3ea", size = 58486, upload-time = "2025-09-30T22:57:42.206Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/d1/5d86d5b4966b2e62e78f4aee31ebcfb4c0f43eeae35c001a777c608014c6/python_benedict-0.36.0.tar.gz", hash = "sha256:e387ef6d4d8250f9910f74124f1163b3cb32cf2374825105ba0cde39735c0bfd", size = 61532, upload-time = "2026-04-12T14:09:19.36Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b6/ae/76f758e10b04c00f26c1613d8c77a078a3001d8ec439ec9e992d7c5a9268/python_benedict-0.35.0-py3-none-any.whl", hash = "sha256:4be33761812a2b8986b19f9dcb9df687feefd81c4cbb11becd044a5e28c340f6", size = 59905, upload-time = "2025-09-30T22:57:40.637Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/87/db342c15bd5adda3d43d6b1b2f3550f8a714fe04a1a74383eccd7ebdb64e/python_benedict-0.36.0-py3-none-any.whl", hash = "sha256:cb83b6c81e3cb95a1d9830623e3c7b6860ba4da025606b70e29c84c483615ae2", size = 61454, upload-time = "2026-04-12T14:09:17.783Z" },
 ]
 
 [[package]]
