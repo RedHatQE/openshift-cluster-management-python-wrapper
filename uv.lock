@@ -1846,7 +1846,7 @@ requires-dist = [
     { name = "openshift-cluster-management-python-client", specifier = ">=1.0.23" },
     { name = "openshift-python-utilities", specifier = ">=5.0.0" },
     { name = "openshift-python-wrapper", specifier = ">=11.0.14" },
-    { name = "python-benedict", specifier = "==0.36.0" },
+    { name = "python-benedict", specifier = "==0.37.0" },
     { name = "python-simple-logger", specifier = ">=1.0.5" },
     { name = "pyyaml", specifier = ">=6.0.1,<7" },
     { name = "redhat-qe-cloud-tools", specifier = ">=1.0.10" },
@@ -2524,19 +2524,15 @@ wheels = [
 
 [[package]]
 name = "python-benedict"
-version = "0.36.0"
+version = "0.37.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "python-fsutil" },
     { name = "python-slugify" },
-    { name = "requests", version = "2.32.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "requests", version = "2.33.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "typing-extensions" },
-    { name = "useful-types" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f5/d1/5d86d5b4966b2e62e78f4aee31ebcfb4c0f43eeae35c001a777c608014c6/python_benedict-0.36.0.tar.gz", hash = "sha256:e387ef6d4d8250f9910f74124f1163b3cb32cf2374825105ba0cde39735c0bfd", size = 61532, upload-time = "2026-04-12T14:09:19.36Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9b/9c/8b75d4ead7c2659f11807bd9eff25c8fa8c32fa635f9f122e4cb6fe7cbf8/python_benedict-0.37.0.tar.gz", hash = "sha256:d2c7d711f45fbb8fdc128c0463b6ad654d68f0c9caeeedd13ed37e5048fc04f3", size = 64760, upload-time = "2026-05-09T09:31:14.715Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ed/87/db342c15bd5adda3d43d6b1b2f3550f8a714fe04a1a74383eccd7ebdb64e/python_benedict-0.36.0-py3-none-any.whl", hash = "sha256:cb83b6c81e3cb95a1d9830623e3c7b6860ba4da025606b70e29c84c483615ae2", size = 61454, upload-time = "2026-04-12T14:09:17.783Z" },
+    { url = "https://files.pythonhosted.org/packages/26/78/62839e41c727676e1725ed147bdc06b24f2efd7c5f5a9739d1aa952a8aff/python_benedict-0.37.0-py3-none-any.whl", hash = "sha256:532ac2d94cfbfef7269984132e42a0b55330ab4275267958ce07301251da46cc", size = 64021, upload-time = "2026-05-09T09:31:13.315Z" },
 ]
 
 [[package]]
@@ -2558,15 +2554,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/82/ed/0301aeeac3e5353ef3d94b6ec08bbcabd04a72018415dcb29e588514bba8/python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3", size = 50135, upload-time = "2026-03-01T16:00:26.196Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0b/d7/1959b9648791274998a9c3526f6d0ec8fd2233e4d4acce81bbae76b44b2a/python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a", size = 22101, upload-time = "2026-03-01T16:00:25.09Z" },
-]
-
-[[package]]
-name = "python-fsutil"
-version = "0.16.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f8/78/74ccf5a2de318703f5456d1809990408f4dc00e1e4cf96a97f7d936f834c/python_fsutil-0.16.1.tar.gz", hash = "sha256:4cc78b9a1e64011cb4fdaeba531e457e649a6a9a560424e841426e47f3a153ad", size = 30364, upload-time = "2026-04-07T17:36:18.481Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/f6/d382531651b720ceefb99013efb8dd01325de703e0ae5128e7cc92d556bc/python_fsutil-0.16.1-py3-none-any.whl", hash = "sha256:bda20802a19f6dc1bd221f6d2a79e0cd2b2c6eaf2b7c353a385c749917047442", size = 20989, upload-time = "2026-04-07T17:36:17.287Z" },
 ]
 
 [[package]]
@@ -3256,18 +3243,6 @@ resolution-markers = [
 sdist = { url = "https://files.pythonhosted.org/packages/c7/24/5f1b3bdffd70275f6661c76461e25f024d5a38a46f04aaca912426a2b1d3/urllib3-2.6.3.tar.gz", hash = "sha256:1b62b6884944a57dbe321509ab94fd4d3b307075e0c2eae991ac71ee15ad38ed", size = 435556, upload-time = "2026-01-07T16:24:43.925Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/39/08/aaaad47bc4e9dc8c725e68f9d04865dbcb2052843ff09c97b08904852d84/urllib3-2.6.3-py3-none-any.whl", hash = "sha256:bf272323e553dfb2e87d9bfd225ca7b0f467b919d7bbd355436d3fd37cb0acd4", size = 131584, upload-time = "2026-01-07T16:24:42.685Z" },
-]
-
-[[package]]
-name = "useful-types"
-version = "0.2.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/92/d6/0d6db1f8766e9b5e7ec259666c40ceae6bbb9326caf50e08717639e167b7/useful_types-0.2.1.tar.gz", hash = "sha256:870a0bcc8fcb7d0b2f14055438c1cab7e248fded942b0943a4d7019e7fbbdacd", size = 4748, upload-time = "2024-04-20T08:58:15.195Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/23/c194fd6c6258727f694e22b106c262c7d2678049dbc2d2045743e235f43a/useful_types-0.2.1-py3-none-any.whl", hash = "sha256:0dca32763d7271b5c8c7c395c44c10d09dba47a41aec97dcb085041ad096e0e9", size = 5382, upload-time = "2024-04-20T08:58:13.759Z" },
 ]
 
 [[package]]
